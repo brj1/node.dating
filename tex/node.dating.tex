@@ -29,12 +29,14 @@
 \titleformat{\section} {\vspace{12pt}\bf\large}{\thesection}{0pt}{}
 \titleformat{\subsection} {\vspace{6pt}\bf}{\thesubsection} {0pt} {\vspace{-2pt}}
 \titleformat{\subsubsection} [runin] {\bf}{\thesubsubsection} {12pt} {}
+
+\newcommand{\code}[1]{{\tt #1}}
  
 \begin{document}
 
-\title{Node dating: dating ancestor nodes in phylogenetic trees}
+\title{node.dating: dating ancestor nodes in phylogenetic trees}
 
-\author{Bradley R. Jones$^{1,2}$}
+\author{Bradley R. Jones \\ Simon Fraser University, Burnaby, Canada \\ BC Centre for Excellence in HIV/AIDS, Vancouver, Canada}
 %%% 1 Simon Fraser University
 %%% 2 BC Centre for Excellence in HIV/AIDS
 \baselineskip 22pt
@@ -46,7 +48,7 @@
 \section * {Abstract}
 
 Keywords: 
-Phylogenetics, Ancestor Dating,  \\
+Phylogenetics, Ancestor Dating, Linear Regression \\
 
 
 
@@ -56,19 +58,28 @@ Phylogenetics, Ancestor Dating,  \\
 %%%%%%%%%%%%%%%%%%%%%%%% METHODS %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{Methods} \label{sec:methods}
+
 \subsection*{Algorithm} \label{sec:alg}
+A simple linear regression is used to estimate the mutation rate assuming a strict molecular clock.
+
+To estimate the dates of the internal nodes, I follow an approach given by \cite{Felsenstein81}. A maximum likelihood method is applied locally to date each internal node. Then using these estimates, the algorithm iterates until an approximate maximum likelihood solution is obtained.
 
 \subsection*{Implementation} \label{sec:impl}
-The node dating algorithm was implemented in R to be part of the APE package \citep{APE}.
+\code{node.dating} was implemented in R to be part of the APE package \citep{APE}.
+
+\subsection*{Simulation} \label{sec:sim}
+To verify the accuracy of \code{node.dating}, I applied it to simulated data. I simulated 50 phylogenetic trees using a birth death model with the the R package \emph{TreeSim} \citep{TreeSim}. I then applied a strict molecular clock to trees wth the R package \emph{NELSI} \citep{NELSI}. I used these trees to generate simulated HIV sequences with \emph{INDELible} 1.03 \citep{Indelible09}. Finally I reconstructed phylogentic trees from the sequences using \emph{RAxML} 8.2.4 \citep{Raxml14}. This process is engineered to replicate phylogenetic trees derived from real data.
 
 \section*{Results} \label{sec:results}
-\subsection*{Baseline tests} \label{sec:test}
-
 \subsection*{Comparison with TempEst} \label{sec:tempest}
+In order to test the viability of \code{node.dating}, I compared it with \emph{TempEst}'s \citep{Tempest} node dating.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Discussion} \label{sec:discuss}
+
+Future work includes allowing node dates to be seeded/fixed and adding a relaxed molecular clock.
 
 \section*{Acknowledgments} \label{sec:ackn}
 %This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure) and by a CIHR operating grant to Art Poon (HOP-111406).
