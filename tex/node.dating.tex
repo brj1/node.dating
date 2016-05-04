@@ -1,0 +1,88 @@
+% !TEX TS-program = xelatex
+\documentclass[12pt]{article}
+
+\usepackage[margin=2cm]{geometry}
+\usepackage{colortbl}
+\usepackage{comment}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{mathptmx}
+\usepackage{nicefrac}
+
+\usepackage{times}
+\usepackage{lineno}
+\usepackage[round]{natbib}
+\makeatletter
+\renewcommand{\@biblabel}[1]{#1.}
+\makeatother
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+\usepackage{url}
+\urlstyle{same}
+
+\usepackage[small,compact]{titlesec}
+
+%\titleformat{\section} {\vspace{24pt}\bf\sffamily\MakeUppercase}{\thesection} {0pt} {}
+\titleformat{\section} {\vspace{12pt}\bf\large}{\thesection}{0pt}{}
+\titleformat{\subsection} {\vspace{6pt}\bf}{\thesubsection} {0pt} {\vspace{-2pt}}
+\titleformat{\subsubsection} [runin] {\bf}{\thesubsubsection} {12pt} {}
+ 
+\begin{document}
+
+\title{Node dating: dating ancestor nodes in phylogenetic trees}
+
+\author{Bradley R. Jones$^{1,2}$}
+%%% 1 Simon Fraser University
+%%% 2 BC Centre for Excellence in HIV/AIDS
+\baselineskip 22pt
+\pagewiselinenumbers
+
+\date{}
+\maketitle
+
+\section * {Abstract}
+
+Keywords: 
+Phylogenetics, Ancestor Dating,  \\
+
+
+
+\underline{}
+\section*{Introduction} \label{sec:intro}
+
+%%%%%%%%%%%%%%%%%%%%%%%% METHODS %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Methods} \label{sec:methods}
+\subsection*{Algorithm} \label{sec:alg}
+
+\subsection*{Implementation} \label{sec:impl}
+The node dating algorithm was implemented in R to be part of the APE package \citep{APE}.
+
+\section*{Results} \label{sec:results}
+\subsection*{Baseline tests} \label{sec:test}
+
+\subsection*{Comparison with TempEst} \label{sec:tempest}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Discussion} \label{sec:discuss}
+
+\section*{Acknowledgments} \label{sec:ackn}
+%This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure) and by a CIHR operating grant to Art Poon (HOP-111406).
+
+\clearpage
+
+\bibliographystyle{plainnat}
+\bibliography{node.dating}
+
+
+\clearpage
+
+%%%%%%%%%%%%%%%  FIGURES  %%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%  TABLES  %%%%%%%%%%%%%%%
+
+\end{document}
