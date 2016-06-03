@@ -27,4 +27,4 @@ pdf("patient_16617.pdf", height=8.5, width=11)
 
 plot.time.tree(tree, col.tip=mark.dna(tree, "#00aa6666", "#6600aa66"), pch.tip=mark.dna(tree, 16, 15), main="Genetic distance versus time of Patient 16617 from LANL")
 
-legend(2170, .02, c("RNA sample", "DNA sample", "internal node"), col=c("#00aa66ff", "#6600aaff", "#aa6600ff"), pch=c(6, 15, 5))
+legend(2170, .02, c("RNA sample", "DNA sample", "internal node"), col=c("#00aa66ff", "#6600aaff", "#aa6600ff"), pch=c(16, 15, 5))

@@ -1,55 +1,32 @@
-% !TEX TS-program = xelatex
-\documentclass[12pt]{article}
+\documentclass{bioinfo}
+\copyrightyear{2016} \pubyear{2016}
 
-\usepackage[margin=2cm]{geometry}
-\usepackage{colortbl}
-\usepackage{comment}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{mathptmx}
-\usepackage{nicefrac}
-\usepackage{tikz}
-\usepackage{authblk}
+\access{Advance Access Publication Date: Day Month Year}
+\appnotes{Application Note}
 
-\usepackage{times}
-\usepackage{lineno}
-\usepackage[round]{natbib}
-\makeatletter
-\renewcommand{\@biblabel}[1]{#1.}
-\makeatother
-
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{xcolor}
-
-\usepackage{url}
-\urlstyle{same}
-
-\usepackage[small,compact]{titlesec}
-
-%\titleformat{\section} {\vspace{24pt}\bf\sffamily\MakeUppercase}{\thesection} {0pt} {}
-\titleformat{\section} {\vspace{12pt}\bf\large}{\thesection}{0pt}{}
-\titleformat{\subsection} {\vspace{6pt}\bf}{\thesubsection} {0pt} {\vspace{-2pt}}
-\titleformat{\subsubsection} [runin] {\bf}{\thesubsubsection} {12pt} {}
-
-\newcommand{\code}[1]{{\tt #1}}
- 
- \captionsetup[subfigure]{width=0.9\textwidth}
- 
 \begin{document}
+\firstpage{1}
 
-\title{node.dating: timing ancestor nodes in phylogenetic trees}
+\subtitle{}
 
-\author[1, 2, *]{Bradley R. Jones}
-\author[2, 3]{Art F. Y. Poon}
-\affil[1]{Faculty of Health Sciences, Simon Fraser University, Burnaby, Canada}
-\affil[2]{BC Centre for Excellence in HIV/AIDS, Vancouver, Canada}
-\affil[3]{Department of Medicine, University of British Columbia, Vancouver, Canada}
-\affil[*]{Corresponding author: brj1@sfu.ca}
-\baselineskip 22pt
-\pagewiselinenumbers
+\title[node.dating]{node.dating: Timing the nodes of ancestral dates in phylogenetic trees}
+\author[Jones \textit{et~al}.]{Bradley R. Jones\,$^{\text{\sfb 1, 2,}*}$ and Art F. Y. Poon\,$^{\text{\sfb 2,3}}$}
+\address{$^{\text{\sf 1}}$Faculty of Health Sciences, Simon Fraser University, Burnaby, V5A 1S6, Canada, \\
+$^{\text{\sf 2}}$BC Centre for Excellence in HIV/AIDS, Vancouver, V6Z 1Y6, Canada and \\
+$^{\text{\sf 2}}$Department of Medicine, University of British Columbia, V5Z 1M9, Canada}
 
-\date{}
+\corresp{$^\ast$To whom correspondence should be addressed.}
+
+\history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
+
+\editor{Associate Editor: XXXXXXX}
+
+\abstract{
+\textbf{Summary:} \\
+\textbf{Availability and Implementation:} \\
+\textbf{Contact:} \href{brj1@sfu.ca}{brj1@sfu.ca}\\
+\textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.}
+
 \maketitle
 
 \section * {Abstract}
@@ -61,7 +38,7 @@ Keywords:
 Phylogenetics, Ancestor Dating, Linear Regression, Molecular Clock \\
 
 \underline{}
-\section*{Introduction} \label{sec:intro}
+\section{Introduction} \label{sec:intro}
 (Motivation.)
 
 Genetic sequences from the same or different species can be organized in phylogenetic trees whose edges record the genetic difference between each sequence.
@@ -80,7 +57,7 @@ Our software, \code{node.dating}, uses a maximum likelihood approach to date the
 
 %\section*{Methods} \label{sec:methods}
 
-\section*{Algorithm} \label{sec:alg}
+\section{Algorithm} \label{sec:alg}
 We start with a rooted phylogenetic tree with edge length equal to genetic distance and the dates when each tip of the tree was sampled.
 
 A simple linear regression is used to estimate the mutation rate assuming a strict molecular clock.
@@ -92,7 +69,7 @@ Then using these estimates, the algorithm iterates until a sufficiently approxim
 %\section*{Implementation} \label{sec:impl}
 %\code{node.dating} was implemented in R to be part of the APE package \citep{APE}.
 
-\section*{Simulation} \label{sec:sim}
+\section{Simulation} \label{sec:sim}
 To verify the accuracy of \code{node.dating}, we applied it to simulated data.
 we simulated 50 phylogenetic trees using a birth-death model with the the R package \emph{TreeSim} \citep{TreeSim}.
 we then applied a strict molecular clock to trees wth the R package \emph{NELSI} \citep{NELSI}.
@@ -109,7 +86,7 @@ with $x_m$ and $y_m$ as the number of pairs of tips in the real (resp.~predicted
 The MRCA was compared instead of then date of each internal node because the tree topologies change after applying \emph{RAxML}. The results are given in the next section.
 
 %\section*{Results} \label{sec:results}
-\section*{Comparison with TempEst and LSD} \label{sec:tempest}
+\section{Comparison with TempEst and LSD} \label{sec:tempest}
 In order to test the viability of \code{node.dating}, we compared it with \emph{TempEst}'s (formerly \emph{Path-O-Gen}) node dating and also with \emph{LSD}.
 \emph{TempEst} uses the prediction given by a linear regression to estimate the dates of the internal nodes and \emph{LSD} uses a least squares method.
 
@@ -123,22 +100,24 @@ Overall, the RMSE of each tree using \code{node.dating} was less than the RMSE u
 The main purpose of \emph{TempEst} is not to date internal nodes, but to detect/verify the presence of a strict molecular clock.
 We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating.
 
+\section{Visualization}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Future work} \label{sec:discuss}
+\section{Future work} \label{sec:discuss}
 One drawback of our methodology is that it assumes that the phylogeny follows a strict moelcular clock. However, the local likelihood model can be extended to incoporate a variable moelcular clock; future work will include this extension. The molecular clock assumption also implies that mutations are structly additive over time, which is not true. It may also be possible to (incorporate) this ``negative'' evolution in the model.
 
 Other future work includes allowing the dates of the internal nodes to be seeded by user-defined values instead of our maximum likelihood method. These seeded values could also be fixed so that the algorithm will not change them.
 
 \section*{Acknowledgments} \label{sec:ackn}
 We would like to thank Richard Liang for assistance in automating \emph{TempEst}.
-%This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure) and by a CIHR operating grant to Art Poon (HOP-111406).
 
-\clearpage
+\section*{Funding} \label{sec:fund}
+This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure) and by a CIHR operating grant to Art Poon (HOP-111406).
 
-\bibliographystyle{plainnat}
+\bibliographystyle{natbib}
 \bibliography{node.dating}
 
-
+\begin{comment}
 \clearpage
 
 %%%%%%%%%%%%%%%  FIGURES  %%%%%%%%%%%%%%%
