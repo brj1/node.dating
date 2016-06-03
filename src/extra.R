@@ -36,7 +36,7 @@ col.nodes <- function(t, col.tip, col.node) {
 
 # Plots a tree's node in a distance versus time
 plot.tree <- function(t, col.tip="#00aa6666", col.node="#aa660066", pch.tip=16, pch.node=5) {
-	plot(t$node.date, node.depth.edgelength(t), col=col.nides(t, col.tip, col.node), pch=pcol.nodes(t, pch.top, pch.node), xlab="Time", ylab="Genetic distance from root")
+	plot(t$node.date, node.depth.edgelength(t), col=col.nodes(t, col.tip, col.node), pch=col.nodes(t, pch.tip, pch.node), xlab="Time", ylab="Genetic distance from root")
 	apply(t$edge, 1, function(e) {
 			arrows(t$node.date[e[1]], node.depth.edgelength(t)[e[1]], t$node.date[e[2]], node.depth.edgelength(t)[e[2]], col="#00000040", length=.1)
 		})

@@ -64,7 +64,8 @@ estimate.mu <- function(t, tip.dates, p=0.05) {
 #
 # t: rooted tree with edge lengths equal to genetic distance
 #
-# tip.dates: vector of dates for the tips, in the same order as t$tip.label
+# node.dates: either a vector of dates for the tips, in the same order as 
+#             t$tip.label; or a vector of dates to initalize each node
 #
 # mu: mutation rate
 #
@@ -90,14 +91,18 @@ estimate.mu <- function(t, tip.dates, p=0.05) {
 # step.
 #
 # returns a vector of all of the dates of the tips and nodes
-estimate.dates <- function(t, tip.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = .Machine$double.eps^0.25, nsteps = 0, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
+estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = .Machine$double.eps^0.25, nsteps = 0, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
 	if (mu < 0)
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 
-		# init vars
-	n.tips <- length(tip.dates)
+	# init vars
+	n.tips <- length(t$tip.label)
 	nodes <- seq(1, t$Nnode)
-	dates <- c(tip.dates, rep(NA, t$Nnode))
+	dates <- if (length(node.dates) == n.tips) {
+			c(node.dates, rep(NA, t$Nnode))
+		} else {
+			node.dates
+		}
 	
 	children <- lapply(nodes,
 		function(x) {
@@ -126,7 +131,7 @@ estimate.dates <- function(t, tip.dates, mu, min.date = -.Machine$double.xmax, s
 		
 	calc.Like <- function(ch.node, ch.edge, x) {
 		tim <- ch.node - x
-		
+				
 		ch.edge*log(tim)-mu*tim
 	}
 		
@@ -203,7 +208,7 @@ estimate.dates <- function(t, tip.dates, mu, min.date = -.Machine$double.xmax, s
 			else 
 				solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge.length, dates[p], p.edge.length)
 		}
-		else {
+		else {		
 			suppressWarnings({res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge.length, p.edge.length, maximum=T)})
 		
 			res$maximum
@@ -257,28 +262,3 @@ estimate.dates <- function(t, tip.dates, mu, min.date = -.Machine$double.xmax, s
 	dates
 }
 
-# Calculate the tree log likelihood 
-#
-# t: rooted tree with edge lengths equal to genetic distance
-#
-# tip.dates: vector of dates for the tips, in the same order as t$tip.label
-#
-# mu: mutation rate
-#
-# returns the log likelihood as a double
-tree.like <- function(tree, node.dates, mu) {
-	if (mu < 0)
-		return(-Inf)
-	
-	scale.lik <- sum(-lgamma(tree$edge.length+1)+(tree$edge.length+1)*log(mu))
-		
-	calc.lik <- function(ch.node, edge, par.node) {
-		tim <- ch.node - par.node
-		
-		print(edge*log(tim)-mu*tim)
-		
-		edge*log(tim)-mu*tim
-	}
-			
-	sum(calc.lik(node.dates[tree$edge[,2]], tree$edge.length, node.dates[tree$edge[,1]])) + scale.lik
-}
