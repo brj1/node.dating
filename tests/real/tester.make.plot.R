@@ -25,6 +25,6 @@ tree$node.date <- estimate.dates(tree, tree$tip.date, tree$mu, nsteps=1000, show
 
 pdf("patient_16617.pdf", height=8.5, width=11)
 
-plot.time.tree(tree, col.tip=mark.dna(tree, "#00aa6666", "#6600aa66"), pch.tip=mark.dna(tree, 16, 15), main="Genetic distance versus time of Patient 16617 from LANL")
+plot.time.tree(tree, col.tip=mark.dna(tree, "#6600aa66", "#00aa6666"), pch.tip=mark.dna(tree, 16, 15), main="Genetic distance versus time of Patient 16617 from LANL", xlab="Time since sero-conversion (days)", ylab="Genetic distance from the root (substitions per base)")
 
-legend(2170, .02, c("RNA sample", "DNA sample", "internal node"), col=c("#00aa66ff", "#6600aaff", "#aa6600ff"), pch=c(16, 15, 5))
+legend(2170, .02, c("RNA samples", "DNA samples", "Internal nodes"), col=c("#00aa66ff", "#6600aaff", "#aa6600ff"), pch=c(16, 15, 5))

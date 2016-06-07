@@ -91,7 +91,7 @@ estimate.mu <- function(t, tip.dates, p=0.05) {
 # step.
 #
 # returns a vector of all of the dates of the tips and nodes
-estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = .Machine$double.eps^0.25, nsteps = 0, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
+estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = .Machine$double.eps^0.25, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
 	if (mu < 0)
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 

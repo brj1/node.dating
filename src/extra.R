@@ -20,9 +20,7 @@ tree.like <- function(tree, node.dates, mu) {
 		
 	calc.lik <- function(ch.node, edge, par.node) {
 		tim <- ch.node - par.node
-		
-		print(edge*log(tim)-mu*tim)
-		
+				
 		edge*log(tim)-mu*tim
 	}
 			
@@ -39,7 +37,7 @@ col.nodes <- function(t, col.tip, col.node) {
 
 # Plots a tree's node in a distance versus time
 plot.time.tree <- function(t, col.tip="#00aa6666", col.node="#aa660066", pch.tip=16, pch.node=5, ...) {
-	plot(t$node.date, node.depth.edgelength(t), col=col.nodes(t, col.tip, col.node), pch=col.nodes(t, pch.tip, pch.node), xlab="Time", ylab="Genetic distance from root", ...)
+	plot(t$node.date, node.depth.edgelength(t), col=col.nodes(t, col.tip, col.node), pch=col.nodes(t, pch.tip, pch.node), ...)
 	apply(t$edge, 1, function(e) {
 			arrows(t$node.date[e[1]], node.depth.edgelength(t)[e[1]], t$node.date[e[2]], node.depth.edgelength(t)[e[2]], col="#00000040", length=.1)
 		})
