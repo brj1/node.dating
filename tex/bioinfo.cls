@@ -978,3 +978,310 @@
 \renewcommand{\dag}{{\mathversion{normal}$^{\dagger}$}}
 
 \endinput
+
+
+
+
+
+
+\@ifundefined{c@WF@wrappedlines}{}{\endinput}
+
+\newdimen\wrapoverhang \wrapoverhang\z@
+\newdimen\WF@size
+\newcount\c@WF@wrappedlines % used globally
+\newbox\WF@box
+\newtoks\WF@everypar
+\newif\ifWF@float
+\let\@@parshape\parshape
+\let\WF@@everypar\everypar
+
+\def\wrapfloat#1{\def\@captype{#1}\@ifnextchar[\WF@wr{\WF@wr[]}}
+
+\def\wrapfigure{\wrapfloat{figure}}
+\def\wraptable{\wrapfloat{table}}
+
+\def\WF@wr[#1]#2{% first two args: #1=num lines, #2=placement
+  \xdef\WF@wfname{wrap\@captype\space}%
+  \ifvoid\WF@box\else \WFclear \WF@collision \fi
+  \xdef\WF@place{\string`\@car#2r\@nil}%
+  \ifnum\lccode\WF@place=\WF@place \global\WF@floatfalse
+    \else \global\WF@floattrue \fi
+  \ifx\parshape\WF@fudgeparshape \ifWF@float\else\WF@collision\fi \else
+   \ifx\par\@@par \ifnum\@@parshape>\z@\WF@conflict\fi \else \WF@conflict\fi
+  \fi \gdef\WF@wli{#1}%
+  \@ifnextchar[\WF@rapt{\WF@rapt[\wrapoverhang]}}
+
+\def\WF@rapt[#1]#2{% final two args: #1 = overhang,  #2 = width,
+  \gdef\WF@ovh{#1}% hold overhang for later, when \width is known
+  \global\setbox\WF@box\vtop\bgroup \setlength\hsize{#2}%
+  \ifdim\hsize>\z@ \@parboxrestore \else 
+  \setbox\z@\hbox\bgroup \let\wf@@caption\caption \let\caption\wf@caption 
+  \ignorespaces \fi}
+
+\def\wf@caption{\relax
+  \ifdim\hsize>\z@ \let\caption\wf@@caption \else
+  \unskip \egroup \hsize\wd\z@ \@parboxrestore \box\z@ \fi \caption}
+
+\def\endwrapfloat{%
+  \ifdim\hsize>\z@ \par\hrule\@width\hsize\@height\z@ % force width
+  \else \unskip \egroup \box\z@ \fi % or end hbox
+  \egroup % end the \vtop; width is known so now is "later"
+  \WF@floatstyhook % support float.sty
+  \def\width{\wd\WF@box}\setlength\wrapoverhang{\WF@ovh}%
+  \xdef\WF@ovh{\the\wrapoverhang}% save until wrapping
+  \ifdim\ht\WF@box>\topskip \ht\WF@box\z@ \fi % too much height, set flag.
+  \ifdim\ht\WF@box<.5\p@ % too tall (starts with \vbox) or too short
+   \global\setbox\WF@box\vtop{\vskip-1.4ex\unvbox\WF@box}\fi
+  \global\WF@size\dp\WF@box % box is guaranteed to have little height.
+  \global\advance\WF@size1.5\baselineskip \global\advance\WF@size\tw@\intextsep
+  \aftergroup\WF@startfloating % even when not really floating!
+  \ifWF@float\else \ifhmode
+     {\unskip \parfillskip\z@skip \par \vskip-\parskip}\aftergroup\noindent
+  \fi\fi \global\@ignoretrue}
+
+\let\endwrapfigure\endwrapfloat
+\let\endwraptable\endwrapfloat
+
+% Subvert \everypar to float fig and do wrapping.  Also for non-float.
+\def\WF@startfloating{%
+ \WF@everypar\expandafter{\the\everypar}\let\everypar\WF@everypar
+ \WF@@everypar{\ifvoid\WF@box\else\WF@floathand\fi \the\everypar
+ \WF@wraphand
+}}
+
+\def\WF@floathand{%
+\ifx\parshape\WF@fudgeparshape \WF@fltmes\else
+  \ifx\par\@@par\ifnum\@@parshape=\z@\ifdim\hangindent=\z@
+    \setbox\z@\lastbox \begingroup
+    \@@par \WF@@everypar{}\WF@putfigmaybe
+    \endgroup % start wrapping
+    \ifvoid\z@\else\box\z@\fi % replace indentation
+  \else\WF@fltmes\fi\else\WF@fltmes\fi\else\WF@fltmes\fi\fi}
+
+% Put fig here if it fits or if it can't float
+\def\WF@putfigmaybe{%
+\ifinner
+  \vskip-\parskip \global\WF@floatfalse
+  \let\pagetotal\maxdimen % kludge flag for "not top of page"
+\else % outer page
+  \@tempdima\pagedepth % save page depth
+   {\advance\parskip\@tempdima\vskip-\parskip}% back up to baseline
+   \penalty\interlinepenalty % update pg. parameters
+   \@tempdimb\pagegoal \advance\@tempdimb-\pagetotal % room left on page
+   \ifdim\@tempdimb<\z@ % \WF@info{Page overfull already;}%
+      \global\WF@floatfalse
+      \ifdim-\@tempdimb>\pageshrink \else \pagebreak \fi
+   \else
+      \ifdim\WF@size>\@tempdimb
+%        \WF@info{Size \the\WF@size\space does not fit in \the\@tempdimb}%
+         \ifWF@float \dimen@.5\baselineskip \else \dimen@ 2\baselineskip\fi
+         \ifdim\pagestretch>\dimen@ \dimen@\pagestretch \fi
+         \ifdim\pagefilstretch>\z@ \dimen@\@tempdimb \fi
+         \ifdim\pagefillstretch>\z@ \dimen@\@tempdimb \fi
+         \advance\dimen@.5\baselineskip
+         \ifdim\dimen@>\@tempdimb % \WF@info{Page nearly full; can stretch}%
+            \global\WF@floatfalse \pagebreak
+         \fi
+      \else % \WF@info{Fits in \the\@tempdimb;}%
+         \global\WF@floatfalse
+   \fi\fi
+   \vskip\@tempdima\relax % (return erased page depth)
+\fi
+\noindent
+\ifWF@float
+  \WF@fltmes
+\else % putting here;
+  \WF@info{Put \WF@wfname here:}%
+  {\ifodd\if@twoside\c@page\else\@ne\fi % assign l/r to i/o placement
+    \lccode`i`l\lccode`o`r\else \lccode`i`r\lccode`o`l\fi
+    \xdef\WF@place{\the\lccode\lccode\WF@place}}% twice to get only l or r
+  \hbox to\z@{% llap or rlap depending on {l} or {r}; calc effective width
+   \@tempdima\wd\WF@box \@tempdimb\WF@ovh
+   \advance\@tempdima-\@tempdimb \advance\@tempdima\columnsep
+   \@tempdimb\hsize \advance\@tempdimb-\@tempdima
+   \xdef\WF@adjlw{\the\@tempdima}%
+   \ifnum `l=\WF@place % fig on left
+    \hss % figure overlaps space to the left
+    \def\@tempa{\kern\columnsep}% position to left of the gap
+   \else  %  fig on right
+    \@tempdima\z@ % no left indentation
+    \kern\@tempdimb \kern\columnsep
+    \def\@tempa{\hss}% figure overlaps space to the right
+   \fi
+   \ifdim\@tempdimb<\hsize
+    \xdef\WF@wrapil{\the\@tempdima \the\@tempdimb}% indentation and length
+    \xdef\WF@adjtlm{\the\@tempdima}%
+   \else
+    \xdef\WF@wrapil{\z@ \the\hsize}%
+    \xdef\WF@adjlw{\z@}\xdef\WF@adjtlm{\z@}%
+   \fi
+   \ifdim\pagetotal=\z@ % \WF@info{Put \WF@wfname at top of p.\thepage}%
+    \global\advance\WF@size-\intextsep
+   \else % \WF@info{Putting \WF@wfname in middle of page}%
+    \setbox\WF@box\hbox{\lower\intextsep\box\WF@box}%
+   \fi \dp\WF@box\z@ \box\WF@box \@tempa
+  }% end \hbox to 0pt
+  \aftergroup\WF@startwrapping % after the \endgroup which immediately follows
+\fi}
+
+\def\WF@startwrapping{%
+ \ifx\WF@wli\@empty
+  {\advance\WF@size1.1\baselineskip
+  \divide\WF@size\baselineskip \global\c@WF@wrappedlines\WF@size}%
+ \else
+  \setcounter{WF@wrappedlines}{\WF@wli}\global\advance\c@WF@wrappedlines\@ne
+ \fi
+ \ifnum\c@WF@wrappedlines>\@ne
+  \let\parshape\WF@fudgeparshape \let\WF@pspars\@empty \let\WF@@par\par
+  \def\@setpar##1{\def\WF@@par{##1}}\def\par{\@par}\let\@par\WF@mypar
+  \xdef\WF@restoretol{\tolerance\the\tolerance}\tolerance9999
+  \advance\linewidth-\WF@adjlw \advance\@totalleftmargin\WF@adjtlm
+ \fi}
+
+\def\WF@wraphand{%
+\ifnum\c@WF@wrappedlines<\tw@ \WF@finale
+\else \begingroup % Create \parshape command:
+ \@tempcnta\@ne \let\WF@wrapil\relax \gdef\WF@ps{}%
+ \@whilenum \@tempcnta<\c@WF@wrappedlines\do{% repeated indentation, length
+  \xdef\WF@ps{\WF@ps\WF@wrapil}\advance\@tempcnta\@ne
+ }\endgroup
+ \ifx\WF@pspars\@empty
+  \@@parshape\c@WF@wrappedlines \WF@ps \WF@noil
+ \else % use external `parshape' values to modify my parshape
+  \WF@modps
+\fi\fi}
+
+\def\WF@mypar{\relax
+ \WF@@par % what the rest of LaTeX expects \par to be (usually \@@par)
+ \ifnum\@@parshape=\z@ \let\WF@pspars\@empty \fi % reset `parshape'
+ \global\advance\c@WF@wrappedlines-\prevgraf \prevgraf\z@
+ \ifnum\c@WF@wrappedlines<\tw@ \WF@finale \fi}
+
+\def\WF@modps{\begingroup
+  \afterassignment\@tempdimb \@tempdima\WF@pspars % a=ind, b=wid
+  \advance\@tempdima-\WF@adjtlm \advance\@tempdimb\WF@adjlw
+%  \afterassignment\dimen@\advance\@tempdima\WF@wrapil
+%  \advance\@tempdimb\dimen@ \advance\@tempdimb-\hsize
+  \let\WF@wrapil\WF@pspars%{\the\@tempdima \the\@tempdimb}%
+  \edef\@tempb{\@@parshape\c@WF@wrappedlines \WF@ps \the\@tempdima \the\@tempdimb}%
+  \expandafter\endgroup\@tempb}
+
+\let\@@setpar\@setpar
+\def\WF@noil{\z@ \hsize}
+\let\WF@pspars\@empty
+
+\def\WF@fudgeparshape{\relax \ifnum\c@WF@wrappedlines<\tw@ \WF@finale
+  \else \afterassignment\WF@fudgeparshapee \fam \fi}
+\def\WF@fudgeparshapee{\ifnum\fam=\@ne \expandafter \WF@parshapeee \else
+  \WF@conflict \@@parshape\fam \fi}
+\def\WF@parshapeee#1#2{\begingroup\delimitershortfall#1%
+   \nulldelimiterspace#2%\advance\nulldelimiterspace\WF@adjlw
+   \edef\@tempa{\def\noexpand\WF@pspars{%
+      \the\delimitershortfall \the\nulldelimiterspace}}%
+  \expandafter\endgroup\@tempa \WF@wraphand}
+
+\def\WF@finale{\ifx\parshape\WF@fudgeparshape
+ \WF@restoretol \let\@setpar\@@setpar \let\par\WF@@par
+ \advance\linewidth\WF@adjlw \advance\@totalleftmargin-\WF@adjtlm
+ \WF@info{Finish wrapping text}%
+ \ifx\par\@@par \def\@par{\let\par\@@par\par}\else \let\@par\WF@@par \fi
+ \let\parshape\@@parshape
+ \parshape\ifx\WF@pspars\@empty \z@ \else \@ne \WF@pspars\fi \fi
+ \ifvoid\WF@box \ifx\everypar\WF@everypar
+  \let\everypar\WF@@everypar \everypar\expandafter{\the\WF@everypar}%
+ \fi\fi}
+
+\newcommand{\WFclear}{\par 
+ \ifvoid\WF@box\else \vskip\bigskipamount \box\WF@box
+ \let\everypar\WF@@everypar \everypar\expandafter{\the\WF@everypar}%
+ \fi \global\c@WF@wrappedlines\z@ \WF@finale}
+
+\begingroup
+ \toks0={\let\everypar\WF@@everypar \everypar\expandafter{\the\WF@everypar}%
+   \let\parshape\@@parshape \let\@setpar\@@setpar }
+ \toks1=\expandafter{\@arrayparboxrestore}
+ \toks2=\expandafter{\clearpage}
+ \edef\@tempa{\def\noexpand\@arrayparboxrestore{\the\toks0 \the\toks1}%
+      \def\noexpand\clearpage{\noexpand\protect\noexpand\WFclear \the\toks2}}
+ \expandafter
+\endgroup\@tempa
+
+\@ifundefined{@capwidth}{\let\@capwidth\hsize}{}% Pamper RevTeX's Stupidity
+
+\def\WF@conflict{\WF@warning
+ {\WF@wfname used inside a conflicting environment}}
+\def\WF@collision{\WF@warning{Collision between wrapping environments}}
+\def\WF@fltmes{\ifWF@float \WF@info{\WF@wfname floats}%
+ \else \WF@warning{Stationary \WF@wfname forced to float}\fi}
+
+\let\WF@warning\@warning
+\let\WF@info\@gobble
+
+% Support float.sty: float styles and \newfloat.  Make \newfloat{foo}
+% define the `wrapfoo' environment.  Support \newfloat from memoir.cls
+% and \newfloatlist from ccaption.sty.
+% 
+\let\WF@floatstyhook\relax
+
+\@ifundefined{newfloat}{}{% There is a \newfloat command
+%
+ \@ifundefined{restylefloat}{
+ % \newfloat comes from somewhere besides float.sty 
+   \@ifclassloaded{memoir}{
+    \toks@=\expandafter\expandafter\expandafter
+     {\csname\string\newfloat\endcsname [{#1}]{#2}{#3}{#4}%
+     \newenvironment{wrap#2}{\wrapfloat{#2}}{\endwrapfloat}%
+    }
+    \edef\@tempa{\def\expandafter\noexpand\csname\string\newfloat\endcsname
+      [##1]##2##3##4{\the\toks@}}
+    \@tempa
+   }% end memoir support
+   {}% Other origins of \newfloat here??
+ }{
+ %  float.sty handler.  Ooops:  Two versions for different versions
+ %  Changing \float@restyle (or \restylefloat) changes \newfloat too.
+ \@ifundefined{float@restyle}{% older float.sty
+  \toks@=\expandafter{\restylefloat{#1}% (env may or may not be defined)
+   \@namedef{wrap#1}{\def\@captype{#1}\@nameuse{fst@#1}%
+    \def\WF@floatstyhook{\let\@currbox\WF@box \columnwidth\wd\WF@box 
+       \global\setbox\WF@box\float@makebox}%
+    \@ifnextchar[\WF@wr{\WF@wr[]}}%
+   \expandafter\let\csname endwrap#1\endcsname \endwrapfigure
+  }\edef\@tempa{\def\noexpand\restylefloat##1{\the\toks@}}
+ }{% newer float.sty: use \float@restyle, and \float@makebox takes width arg
+  \toks@=\expandafter{\float@restyle{#1}% (env may or may not be defined)
+   \@namedef{wrap#1}{\def\@captype{#1}\@nameuse{fst@#1}%
+    \def\WF@floatstyhook{\let\@currbox\WF@box 
+       \global\setbox\WF@box\float@makebox{\wd\WF@box}}%
+    \@ifnextchar[\WF@wr{\WF@wr[]}}%
+   \expandafter\let\csname endwrap#1\endcsname \endwrapfigure
+  }\edef\@tempa{\def\noexpand\float@restyle##1{\the\toks@}}
+ }
+ \@tempa % perform redefinitions
+ %
+ }% End float.sty handler
+}% End redefinitions of \newfloat
+
+% Support ccaption.sty 
+\@ifundefined{\string\newfloatlist}{}{
+ \toks@=\expandafter\expandafter\expandafter
+   {\csname\string\newfloatlist\endcsname [{#1}]{#2}{#3}{#4}{#5}%
+  \@namedef{wrap#2}{\wrapfloat{#2}}%
+  \expandafter\let\csname endwrap#2\endcsname \endwrapfloat
+ }
+ \edef\@tempa{\def\expandafter\noexpand\csname\string\newfloatlist\endcsname
+   [##1]##2##3##4##5{\the\toks@}}
+ \@tempa
+}
+
+% Process package options.
+
+\@ifundefined{DeclareOption}{\endinput}{}
+
+\def\WF@warning{\PackageWarning{wrapfig}}
+\ProvidesPackage{wrapfig}[2003/01/31 \space  v 3.6]
+\DeclareOption{verbose}{\def\WF@info{\PackageInfo{wrapfig}}}
+\ProcessOptions
+\AtEndDocument{\WFclear}
+
+\endinput

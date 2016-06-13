@@ -65,7 +65,7 @@ for (i in 1:1000) {
 	cat("\n")
 	
 #	trees <- lapply(trees, function(t) {t$node.date <- estimate.dates(t, t$node.date, t$mu, opt.tol=1e-8, nsteps=100, lik.tol=0, is.binary=T); t})
-	trees <- lapply(trees, function(t) {t$node.date <- estimate.dates(t, t$node.date, t$mu, opt.tol=1e-8, nsteps=0, lik.tol=0, is.binary=T); t})
+	trees <- lapply(trees, function(t) {t$node.date <- estimate.dates(t, t$node.date, t$mu, opt.tol=1e-8, nsteps=1, lik.tol=0, is.binary=T); t})
 	
 #	rmses[, i + 2] <- unlist(lapply(1:n.trees, function(j) rmse(trees[[j]]$mrcas, trees[[j]]$node.date, j, sqrt.weight)))
 #	lik[, i + 2] <- unlist(lapply(trees, function(t) tree.like(t, t$node.date, t$mu)))

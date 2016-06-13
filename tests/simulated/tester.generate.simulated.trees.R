@@ -150,18 +150,3 @@ trees <- lapply(seq(1, n.trees), function(i) {
 trees <- lapply(trees, function(t) {t$tip.date <- extract_dates(t$tip.label); t})
 trees <- lapply(trees, function(t) {rtt(t, t$tip.date, opt.tol=1e-8)})
 lapply(seq(1, n.trees), function(i) write.tree(trees[[i]], file=paste0("HIV_", i , "_rooted.tre")))
-
-trees <- lapply(trees, function(t) {t$tip.date <- extract_dates(t$tip.label); t})
-trees <- lapply(trees, function(t) {t$mu <- estimate.mu(t, t$tip.date); t})
-trees <- lapply(trees, function(t) {t$node.date <- estimate.dates(t, t$tip.date, t$mu, opt.tol=1e-8, lik.tol=1e-10, nsteps=1000, show.steps=100); t})
-
-for (i in 1:n.trees) {
-	m <- mrca(trees[[i]])
-	dates <- trees[[i]]$node.date
-	
-	write.csv(m, file=paste0("HIV_", i, "_mrca_node.dating.csv"))
-	
-	m <- apply(m, c(1, 2), function(n) dates[n])
-	
-	write.csv(m, file=paste0("HIV_", i, "_dates_node.dating.csv"))
-}

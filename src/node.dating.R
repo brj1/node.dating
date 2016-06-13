@@ -104,6 +104,13 @@ estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, 
 			node.dates
 		}
 	
+	# Don't count initial step	
+	iter.step <-  if (any(is.na(dates))) {
+			0
+		} else {
+			1
+		}
+	
 	children <- lapply(nodes,
 		function(x) {
 			t$edge[,1] == x + n.tips
@@ -216,8 +223,7 @@ estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, 
 	}
 	
 	# iterate to estimate dates
-	lik=NA
-	iter.step=0
+	lik <- NA
 	
 	repeat
 	{
@@ -239,8 +245,6 @@ estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, 
 			cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
 		}
 		
-		iter.step <- iter.step + 1
-							
 		if ((lik.tol > 0 && (!is.na(lik) && (is.infinite(lik) || is.infinite(new.lik) || new.lik - lik < lik.tol))) || (nsteps > 0 && iter.step >= nsteps) || (lik.tol <= 0 && nsteps <= 0)) {
 			if (is.infinite(lik) || is.infinite(new.lik)) {
 				warning("Likelihood infinite")
@@ -253,10 +257,12 @@ estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, 
 		} else {
 			lik <- new.lik
 		}
+		
+		iter.step <- iter.step + 1
 	}
 	
 	if (show.steps > 0) {
-		cat(paste("Step: ", iter.step - 1, ", Likelihood: ", new.lik, "\n", sep=""))
+		cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
 	}
 	
 	dates
