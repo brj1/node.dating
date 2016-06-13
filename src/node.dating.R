@@ -91,31 +91,31 @@ estimate.mu <- function(t, tip.dates, p=0.05) {
 # step.
 #
 # returns a vector of all of the dates of the tips and nodes
-estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = .Machine$double.eps^0.25, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
+estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
 	if (mu < 0)
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 
 	# init vars
 	n.tips <- length(t$tip.label)
-	nodes <- seq(1, t$Nnode)
+	nodes <- unique(reorder(t)$edge[,1])
 	dates <- if (length(node.dates) == n.tips) {
 			c(node.dates, rep(NA, t$Nnode))
 		} else {
 			node.dates
 		}
 	
-	# Don't count initial step	
+	# Don't count initial step if all values are seeded
 	iter.step <-  if (any(is.na(dates))) {
 			0
 		} else {
 			1
 		}
 	
-	children <- lapply(nodes,
+	children <- lapply(1:t$Nnode,
 		function(x) {
 			t$edge[,1] == x + n.tips
 		})
-	parent <- lapply(nodes,
+	parent <- lapply(1:t$Nnode,
 		function(x) {
 			t$edge[,2] == x + n.tips
 		})
@@ -155,8 +155,11 @@ estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, 
 		b <- ch.edge.length[1] + ch.edge.length[2] - 2 * mu * (ch.times[1] + ch.times[2])
 		c.0 <- 2*mu*ch.times[1] * ch.times[2] - ch.times[1] * ch.edge.length[2] - ch.times[2] * ch.edge.length[1]
 		
-		if (b ^ 2 - 4 * a * c.0 < 0)
+		b ^ 2 - 4 * a * c.0 < 0
+		
+		if (b ^ 2 - 4 * a * c.0 < 0) {		
 			return(bounds[1 + (sum(calc.Like(ch.times, ch.edge.length, bounds[2] - opt.tol)) > sum(calc.Like(ch.times, ch.edge.length, bounds[1] + opt.tol)))])
+		}
 		else {
 			x.1 <- (-b + sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
 			x.2 <- (-b - sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
@@ -216,7 +219,7 @@ estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, 
 				solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge.length, dates[p], p.edge.length)
 		}
 		else {		
-			suppressWarnings({res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge.length, p.edge.length, maximum=T)})
+			res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge.length, p.edge.length, maximum=T)
 		
 			res$maximum
 		}

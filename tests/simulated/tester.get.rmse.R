@@ -1,5 +1,3 @@
-n.trees = 50
-
 args <- commandArgs(trailing=T)
 
 program <- args[1]
@@ -36,6 +34,6 @@ rmse <- function(n) {
 	sqrt(sum(d) / sum(rmse.weight[[n]]))
 }
 
-rmse <- lapply(1:n.trees, function(i) rmse(i))
+rmses <- lapply(1:n.trees, function(i) rmse(i))
 
-mean(unlist(rmse))
+mean(unlist(rmses))

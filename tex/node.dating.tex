@@ -17,7 +17,6 @@
 
 \usepackage{float}
 
-
 \newcommand{\code}[1]{{\tt #1}}
 
 
@@ -69,6 +68,7 @@ A multitude of software has been developed to date MRCA's and create time trees 
 However, most of this software is difficult to access or use.
 Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
 \code{node.dating} is written in \emph{R} and is compatible with the \emph{R} package \emph{APE} \citep{APE}; it is available ().
+\emph{APE} has the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} does not incorporate the dates of the tips into its solution and thus does not offer the same precision as \code{node.dating}.
 
 \section{Algorithm} \label{sec:alg}
 We start with a rooted phylogenetic tree with edge length equal to genetic distance and the dates when each tip of the tree was sampled.
@@ -77,7 +77,7 @@ To estimate the dates of the internal nodes, we follow an approach given by \cit
 A maximum likelihood method is applied locally to date each internal node.
 Then using these estimates, the algorithm iterates until a sufficiently approximate maximum likelihood solution is obtained.
 
-\section{Runtime and accuracy}
+\section{Runtime and accuracy} \label{sec:tests}
 In order to test the viability of \code{node.dating}, we ran \code{node.dating} on 50 simulated trees.
 We evaluated the results of \code{node.dating} using a weighted root mean squared error (RMSE).
 The simulation method and weighted RMSE are detailed in the Supplementary Information.
@@ -92,9 +92,9 @@ The average RMSE's of \emph{TempEst} and \emph{LSD} are higher than the average 
 However, the main purpose of \emph{TempEst} is not to date internal nodes, but to detect/verify the presence of a strict molecular clock.
 We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating.
 
-BEAST performed the best of all methods when running $10^8$ steps, but this also took the most time.
-With $10^4$ steps BEAST performed terribly and in around the same amount of time as \code{node.dating} at 100 steps.
-However, the results using BEAST are not completely comparable since we used the sequence data for BEAST instead of the reconstructed phylogenies.
+\emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
+With $10^4$ steps \emph{BEAST} performed terribly and in around the same amount of time as \code{node.dating} at 100 steps.
+However, the results using \emph{BEAST} are not completely comparable since we used the sequence data for \emph{BEAST} instead of the reconstructed phylogenies.
 
 \begin{table}[t]
 	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} and comparable software on 50 simulated trees}
@@ -104,9 +104,9 @@ However, the results using BEAST are not completely comparable since we used the
 		\hline
 		Software & Runtime (s) & RMSE (days) \\
 		\hline
-		\code{node.dating} (initial) & 1.63 & 29.2 \\
-		\code{node.dating} (1 step) & 2.26 & 26.6 \\
-		\code{node.dating} (10 steps) & 7.72 & 23.7 \\
+		\code{node.dating} (initial) & 1.64 & 29.2 \\
+		\code{node.dating} (1 step) & 2.26 & 26.7 \\
+		\code{node.dating} (10 steps) & 7.62 & 23.7 \\
 		\code{node.dating} (100 steps) & 61.8 & 22.8 \\
 		\code{node.dating} (1000 steps) & 596 & 22.6 \\
 		\code{node.dating} ($10^4$ steps) & 5940 & 22.1 \\
@@ -114,16 +114,23 @@ However, the results using BEAST are not completely comparable since we used the
 		\emph{LSD} & 0.707 & 24.9 \\
 		\emph{BEAST} ($10^4$ steps) & 181 & 419 \\
 		\emph{BEAST} ($10^6$ steps) & 6840 & 20.1 \\
+%		\emph{Minimum} & & 2.02 \\
 		\hline
 	\end{tabular}
 \end{table}
 
-\section{Visualization}
+\section{Visualization} \label{sec:vis}
 In this section, we exhibit a visualization of sequence data using the estimated dates of internal nodes.
-We retrieved intra-host patient-derivied sequences from Patient 16617 on the LANL HIV database \citep{LosAlamos}.
+We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database \citep{LosAlamos}.
 This patient's sequence data was collected in \cite{Llewellyn06} as Patient 1180.
 We reconstructed the sequences' phylogenetic tree using the method described in the Supplementary Information.
 We then estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. This plot displayed shown in Figure \ref{fig:pat16617}.
+
+\section{Future work} \label{sec:discuss}
+One drawback of our methodology is that it assumes that the phylogeny follows a strict molecular clock.
+However, the local likelihood model can be extended to incorporate a variable molecular clock; future work would like to include this extension.
+The molecular clock assumption also implies that mutations \showthe\parskip are strictly additive over time, which is not true.
+It may also be possible to incorporate this ``negative'' evolution into the model.
 
 \begin{figure}[t]
 	\centering
@@ -132,16 +139,9 @@ We then estimated the dates of the internal nodes using \code{node.dating} with 
 	\label{fig:pat16617}
 \end{figure}
 
-\section{Future work} \label{sec:discuss}
-One drawback of our methodology is that it assumes that the phylogeny follows a strict moelcular clock.
-However, the local likelihood model can be extended to incoporate a variable moelcular clock; future work would like to include this extension.
-The molecular clock assumption also implies that mutations are strictly additive over time, which is not true.
-It may also be possible to incorporate this ``negative'' evolution into the model.
-
-\section*{Acknowledgments} \label{sec:ackn}
+\section*{Acknowledgements} \label{sec:ackn}
 We would like to thank Richard Liang for his aid in automating \emph{TempEst}.
-% remind latex that this section fits here
-\\\\\\
+\newpage
 
 \section*{Funding} \label{sec:fund}
 This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure), by the Bill and Melinda Gates Foundation Award Number OPP1110049, and by a CIHR operating grant to Art Poon (HOP-111406).
