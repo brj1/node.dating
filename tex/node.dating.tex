@@ -25,7 +25,7 @@
 
 \subtitle{}
 
-\title[node.dating]{node.dating: Timing ancestral dates in phylogenetic trees in R}
+\title[node.dating]{node.dating: dating ancestors in phylogenetic trees in R}
 \author[Jones \textit{et~al}.]{Bradley R. Jones\,$^{\text{\sfb 1, 2,}*}$ and Art F. Y. Poon\,$^{\text{\sfb 2,3}}$}
 \address{$^{\text{\sf 1}}$Faculty of Health Sciences, Simon Fraser University, Burnaby, V5A 1S6, Canada, \\
 $^{\text{\sf 2}}$BC Centre for Excellence in HIV/AIDS, Vancouver, V6Z 1Y6, Canada and \\
@@ -65,10 +65,10 @@ These date estimates are an important resource for reconstructing the evolutiona
 In molecular epidemiology, these dates can also provide a rough approximation of transmission times during an outbreak of infectious disease \citep{Ypma13}.
 
 A multitude of software has been developed to date MRCA's and create time trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
-However, most of this software is difficult to access or use.
+However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
 Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
 \code{node.dating} is written in \emph{R} and is compatible with the \emph{R} package \emph{APE} \citep{APE}; it is available ().
-\emph{APE} has the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} does not incorporate the dates of the tips into its solution and thus does not offer the same precision as \code{node.dating}.
+\emph{APE} has the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
 
 \section{Algorithm} \label{sec:alg}
 We start with a rooted phylogenetic tree with edge length equal to genetic distance and the dates when each tip of the tree was sampled.
