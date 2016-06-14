@@ -23,7 +23,7 @@
  
 \begin{document}
 
-\title{Supplementary Information // node.dating: Timing the nodes of ancestral dates in phylogenetic trees}
+\title{Supplementary Information \\ node.dating: timing the nodes of ancestral dates in phylogenetic trees in R}
 
 \author[1,2,*]{Bradley R. Jones}
 \author[2,3]{Art F.Y. Poon}
@@ -39,9 +39,9 @@
 \section{Simulation} \label{sec:sim}
 To verify the accuracy of \code{node.dating}, we applied it to simulated data.
 we simulated 50 phylogenetic trees using a birth-death model with the the R package \emph{TreeSim} \citep{TreeSim} using the parameters: $\lambda = 5.116 \times 10^{-2}$ day$^{-1}$, $\delta = 5.006 \times 10^{-2}$ day$^{-1}$, and $s = 5.237 \times 10^{-3}$.
-we then applied a strict molecular clock to trees wth the R package \emph{NELSI} \citep{NELSI} using the parameters: $\mu = \ 1.964\times 10^{-4}$ and $\sigma = \ 1.417\times 10^{-5}$ substitutions per generation.
-we used these trees to generate simulated HIV sequences with \emph{INDELible} 1.03 \citep{Indelible09} using a HKY85 nuceleotide substitution model \citep{HKY85} with a stationary distribution of 0.42, 0.15, 0.15, 0.28 for A, C, G, T respectively and a transitional bias of 8.5.
-Finally we reconstructed phylogenetic trees from the sequences using \emph{RAxML} 8.2.4 \citep{Raxml14} with the GTR model and rooted the trees using the \code{rtt} function of the APE package.
+we then applied a strict molecular clock to trees wt the R package \emph{NELSI} \citep{NELSI} using the parameters: $\mu = \ 1.964\times 10^{-4}$ and $\sigma = \ 1.417\times 10^{-5}$ substitutions per generation.
+we used these trees to generate simulated HIV sequences with \emph{INDELible} 1.03 \citep{Indelible09} using a HKY85 nucleotide substitution model \citep{HKY85} with a stationary distribution of 0.42, 0.15, 0.15, 0.28 for A, C, G, T respectively and a transitional bias of 8.5.
+Finally we reconstructed phylogenetic trees from the sequences using \emph{RAxML} 8.2.4 \citep{Raxml14} with the GTR model and rooted the trees using the \code{rtt} function of the \emph{APE} package.
 This process is engineered to replicate phylogenetic trees derived from real data.
 
 \section{Weighted RMSE} \label{sec:rmse}
@@ -49,14 +49,14 @@ This process is engineered to replicate phylogenetic trees derived from real dat
 The dates of the MRCA of each pair of tips of the original birth-death tree were saved and compared with the results of \code{node.dating} using a weighted root mean squared error (RMSE) as the error metric.
 Specifically:
 \[\operatorname{RMSE} = \sqrt{\frac{\sum_{1 \leq i < j \leq N}w_{i,j}\left(d_{\operatorname{MRCA}_{t_r}(i,j)} - \delta_{\operatorname{MRCA}_{t_p}(i,j)}\right)^2}{\sum_{1 \leq i < j \leq N}w_{i,j}}}\]
-where $t_r$ and $t_p$ are the real (resp.~predicted) phylogenies each with $N$ tips; $\operatorname{MRCA}_t(i, j)$ is the MRCA of tip $i$ and $j$ in the phyolgeny, $t$; $d_{m}$ and $\delta_m$ are the real (resp.~predicted) dates of the MRCA, $m$; and $w_{i, j}$ is the weight of the pair of tips, $i$ and $j$, and is given by:
+where $t_r$ and $t_p$ are the real (resp.~predicted) phylogenies each with $N$ tips; $\operatorname{MRCA}_t(i, j)$ is the MRCA of tip $i$ and $j$ in the phylogeny, $t$; $d_{m}$ and $\delta_m$ are the real (resp.~predicted) dates of the MRCA, $m$; and $w_{i, j}$ is the weight of the pair of tips, $i$ and $j$, and is given by:
 \[w_{i, j} = \sqrt{\nicefrac{1}{\left(x_{\operatorname{MRCA}_{t_r}(i,j)}y_{\operatorname{MRCA}_{t_p}(i,j)}\right)}}\]
 with $x_m$ and $y_m$ as the number of pairs of tips in the real (resp.~predicted) phylogeny whose MRCA is $m$.
 The MRCA was compared instead of the date of each internal node because the tree topologies may change after applying \emph{RAxML}.
 
 For our analysis we considered the mean of the RMSE for each phylogeny.
 
-\section{Aquistition of real data}
+\section{Acquisition of real data}
 Sequences were aligned using MUSCLE 3.8.31 \citep{Muscle04} and inspected and cleaned using AliView \citep{AliView14}. 
 We trimmed the alignments so that each sequence had at least 50\% coverage over each base.
 We reconstructed the phylogeny of the patient's sequences using \emph{RAxML} 8.2.4 \citep{Raxml14} and rooted the tree using the \code{rtt} function of APE.

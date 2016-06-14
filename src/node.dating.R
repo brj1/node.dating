@@ -47,7 +47,7 @@ library(ape)
 # p: p-value cutoff for failed regression (default=0.05)
 #
 # returns the mutation rate as a double
-estimate.mu <- function(t, tip.dates, p=0.05) {
+estimate.mu <- function(t, tip.dates, p = 0.05) {
 	# fit linear model
 	g <- glm(node.depth.edgelength(t)[1:length(tip.dates)] ~ tip.dates, na.action=na.omit)
 	null.g <- glm(node.depth.edgelength(t)[1:length(tip.dates)] ~ 1, na.action=na.omit)
@@ -91,7 +91,7 @@ estimate.mu <- function(t, tip.dates, p=0.05) {
 # step.
 #
 # returns a vector of all of the dates of the tips and nodes
-estimate.dates <- function(t, node.dates, mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
 	if (mu < 0)
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 

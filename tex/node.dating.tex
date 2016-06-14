@@ -12,8 +12,8 @@
 \usepackage{graphicx}
 \graphicspath{{./figures/}}
 
-\usepackage{xr}
-\externaldocument{si-node.dating}
+%\usepackage{xr}
+%\externaldocument{si-node.dating}
 
 \usepackage{float}
 
@@ -25,7 +25,7 @@
 
 \subtitle{}
 
-\title[node.dating]{node.dating: Timing ancestral dates in phylogenetic trees in R}
+\title[node.dating]{node.dating: timing ancestral dates in phylogenetic trees in R}
 \author[Jones \textit{et~al}.]{Bradley R. Jones\,$^{\text{\sfb 1, 2,}*}$ and Art F. Y. Poon\,$^{\text{\sfb 2,3}}$}
 \address{$^{\text{\sf 1}}$Faculty of Health Sciences, Simon Fraser University, Burnaby, V5A 1S6, Canada, \\
 $^{\text{\sf 2}}$BC Centre for Excellence in HIV/AIDS, Vancouver, V6Z 1Y6, Canada and \\
@@ -107,12 +107,12 @@ However, the results using \emph{BEAST} are not completely comparable since we u
 		\code{node.dating} (initial) & 1.64 & 29.2 \\
 		\code{node.dating} (1 step) & 2.26 & 26.7 \\
 		\code{node.dating} (10 steps) & 7.62 & 23.7 \\
-		\code{node.dating} (100 steps) & 61.8 & 22.8 \\
-		\code{node.dating} (1000 steps) & 596 & 22.6 \\
-		\code{node.dating} ($10^4$ steps) & 5940 & 22.1 \\
-		\emph{TempEst} & 11.2 & 132 \\
+		\code{node.dating} (100 steps) & 62.1 & 22.8 \\
+		\code{node.dating} (1000 steps) & 596. & 22.6 \\
+		\code{node.dating} ($10^4$ steps) & 5950 & 22.1 \\
+		\emph{TempEst} & 11.2 & 132. \\
 		\emph{LSD} & 0.707 & 24.9 \\
-		\emph{BEAST} ($10^4$ steps) & 181 & 419 \\
+		\emph{BEAST} ($10^4$ steps) & 181 & 419. \\
 		\emph{BEAST} ($10^6$ steps) & 6840 & 20.1 \\
 %		\emph{Minimum} & & 2.02 \\
 		\hline
