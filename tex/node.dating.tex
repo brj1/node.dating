@@ -44,7 +44,7 @@ $^{\text{\sf 2}}$Department of Medicine, University of British Columbia, V5Z 1M9
 Phylogenetic trees encode the evolutionary distances between species or populations.
 With sufficient information, these evolutionary distances can be rescaled over time to provide estimates of the dates of the most recent ancestors of the species.
 Here we present the $R$ software \code{node.dating}, which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
-\textbf{Availability and Implementation:} \code{node.dating} is written in $R$ and requires the $R$ package, \emph{APE}. \code{node.dating} is available () \\
+\textbf{Availability and Implementation:} \code{node.dating} is written in $R$ and requires the $R$ package, \emph{APE}. \code{node.dating} is available in the GitHub repository: https://github.com/brj1/node.dating.git. \\
 \textbf{Contact:} \href{brj1@sfu.ca}{brj1@sfu.ca}\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.}
 
@@ -69,7 +69,7 @@ In molecular epidemiology, these dates can also provide a rough approximation of
 A multitude of software has been developed to date MRCA's and create time trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
 However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
 Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
-\code{node.dating} is written in \emph{R} and is compatible with the \emph{R} package \emph{APE} \citep{APE}; it is available ().
+\code{node.dating} is written in \emph{R} and is compatible with the \emph{R} package \emph{APE} \citep{APE}; it is available in the GitHub repository: https://github.com/brj1/node.dating.
 \emph{APE} has the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
 
 \section{Algorithm} \label{sec:alg}
@@ -92,9 +92,7 @@ We also compared our results using \emph{BEAST}, but on the simulated sequences 
 The average RMSE's of \emph{TempEst} and \emph{LSD} are higher than the average weighted RMSE of the MRCA using \code{node.dating} with 1000 steps, though the weighted RMSE of \emph{LSD} is comparable to the RMSE of \code{node.dating}.
 %Overall, the RMSE of each tree using \code{node.dating} with 1000 iterations was less than the RMSE using \emph{TempEst}, suggesting that \code{node.dating} is more accurate at dating the internal nodes of phylogenetic trees.
 However, the main purpose of \emph{TempEst} is not to date internal nodes, but to detect/verify the presence of a strict molecular clock.
-We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating.
-
-\emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
+We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating. \emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
 With $10^4$ steps \emph{BEAST} performed terribly and in around the same amount of time as \code{node.dating} at 100 steps.
 However, the results using \emph{BEAST} are not completely comparable since we used the sequence data for \emph{BEAST} instead of the reconstructed phylogenies.
 

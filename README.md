@@ -1,2 +1,2 @@
 # node.dating
-Timing the nodes of ancestral dates in phylogenetic trees
+Dating ancestors in phylogenetic trees in R
