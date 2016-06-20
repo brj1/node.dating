@@ -91,13 +91,16 @@ non-contemporaneous sequences into maximum likelihood phylogenies." Bioinformati
 }
 \examples{
 t <- rtree(100)
-tip.date <- rnorm(t$tip.label)^2
-rtt(t, tip.date)
+tip.date <- rnorm(t$tip.label, mean=node.depth.edgelength(t)[1:length(t$tip.label)])^2
+t <- rtt(t, tip.date)
 mu <- estimate.mu(t, tip.date)
 
 ## Run for 1000 steps
 node.date <- estimate.dates(t, tip.date, mu)
 
 ## Run until the difference between successive log likelihoods is less than $10^{-8}$ starting with the 1000th step's results
-estimate.dates(t, node.date, mu, nsteps=0, lik.tol=1e-8)
+node.date <- estimate.dates(t, node.date, mu, nsteps=0, lik.tol=1e-4)
+
+## To rescale the tree over time
+t$edge.length <- unlist(apply(t$edge, 1, function(x) node.date[x[2]] - node.date[x[1]]))
 }
