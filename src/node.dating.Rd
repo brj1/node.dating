@@ -98,7 +98,6 @@ mu <- estimate.mu(t, tip.date)
 ## Run for 1000 steps
 node.date <- estimate.dates(t, tip.date, mu)
 
-## Run until the difference between successive log likelihoods is less than \
-  $10^{-8}$ starting with the 1000th step's results
+## Run until the difference between successive log likelihoods is less than $10^{-8}$ starting with the 1000th step's results
 estimate.dates(t, node.date, mu, nsteps=0, lik.tol=1e-8)
 }
