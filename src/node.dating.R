@@ -47,10 +47,10 @@ library(ape)
 # p: p-value cutoff for failed regression (default=0.05)
 #
 # returns the mutation rate as a double
-estimate.mu <- function(t, tip.dates, p = 0.05) {
+estimate.mu <- function(t, node.dates, p = 0.05) {
 	# fit linear model
-	g <- glm(node.depth.edgelength(t)[1:length(tip.dates)] ~ tip.dates, na.action=na.omit)
-	null.g <- glm(node.depth.edgelength(t)[1:length(tip.dates)] ~ 1, na.action=na.omit)
+	g <- glm(node.depth.edgelength(t)[1:length(node.dates)] ~ tip.dates, na.action=na.omit)
+	null.g <- glm(node.depth.edgelength(t)[1:length(node.dates)] ~ 1, na.action=na.omit)
 
 	# test fit
 	if ((1 - pchisq(AIC(null.g) - AIC(g) + 2, df=1)) > p) {
@@ -72,26 +72,28 @@ estimate.mu <- function(t, tip.dates, p = 0.05) {
 # min.date: the minimum date that a node can have (needed for optimize()). The 
 #           default is -.Machine$double.xmax
 #
-# show.steps: set to a positive integer, n, to print the log likelihood every 
-#             nsteps. Set to 0 to supress output
+# show.steps: set to print the log likelihood every show.steps. Set to 0 to 
+#             supress output
 #
 # opt.tol: tolerance for optimization precision. By default, the optimize()
 #          function uses a tolerance of .Machine$double.eps^0.25 (see ?optimize)
 #
 # lik.tol: tolerance for likelihood comparison. estimate.dates will stop when
 #          the log likelihood between successive trees is less than like.tol. If
-#          0 will stop when nsteps.
+#          0 will stop after nsteps steps.
 #
-# nsteps: the maximum number of steps to run. If 0 will run until lik.tol.
+# nsteps: the maximum number of steps to run. If 0 will run until the log 
+#         likelihood between successive runs is less than lik.tol. The default 
+#         is 1000.
 #
 # is.binary: if the phylogentic tree is binary, setting is.binary to TRUE, will 
-#            run a faster algorithm
+#            run a optimization method
 #
 # If lik.tol and nsteps are both 0 then estimate.dates will only run the inital 
 # step.
 #
 # returns a vector of all of the dates of the tips and nodes
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = F) {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t)) {
 	if (mu < 0)
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 
