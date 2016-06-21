@@ -43,7 +43,7 @@ $^{\text{\sf 2}}$Department of Medicine, University of British Columbia, V5Z 1M9
 \textbf{Summary:}
 Phylogenetic trees encode the evolutionary distances between species or populations.
 With sufficient information, these evolutionary distances can be rescaled over time to provide estimates of the dates of the most recent ancestors of the species.
-Here we present the $R$ software \code{node.dating}, which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
+Here we present the $R$ program \code{node.dating}, which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
 \textbf{Availability and Implementation:} \code{node.dating} is written in $R$ and requires the $R$ package, \emph{ape}.
 \code{node.dating} is available as a part of the $R$ package \emph{ape} (cran.r-project.org). Supplementary software and tests are available at the GitHub repository: https://github.com/brj1/node.dating.  \\
 \textbf{Contact:} \href{brj1@sfu.ca}{brj1@sfu.ca}\\
@@ -56,10 +56,12 @@ Here we present the $R$ software \code{node.dating}, which uses a maximum likeli
 
 \underline{}
 
+\vspace * {-0.5in}
+
 \section{Introduction} \label{sec:intro}
 Phylogenetic trees represent the evolutionary relationships among populations or species through their common ancestors.  
 %(Ways to make trees \citep{Raxml14}).
-The length of a branch in the phylogeny corresponds to the expected amount of evolution between the ancestor and its descendant, where the passage of time and the rate of evolution are confounded.
+The length of a branch in the phylogeny usually corresponds to the expected amount of evolution between the ancestor and its descendant, where the passage of time and the rate of evolution are confounded.
 However, when there is external information available on the location of nodes in the tree in time, then the branch lengths can be rescaled with respect to time given sufficient variation in node timings for measurable evolution to occur.
 %In the presence of a molecular clock, the edges of a phylogenetic tree can be scaled over time to give a `time tree'.
 %The nodes of a time tree also carry a time value which for the tips of the tree represent the sampling time of the tip's sequence.
@@ -67,7 +69,7 @@ Thus, the internal nodes of a time-scaled tree estimate the dates that the respe
 These date estimates are an important resource for reconstructing the evolutionary history of species \citep{Shapiro04}.
 In molecular epidemiology, these dates can also provide a rough approximation of transmission times during an outbreak of infectious disease \citep{Ypma13}.
 
-A multitude of software has been developed to date MRCA's and create time trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
+A multitude of software has been developed to reconstruct ancestral dates and create time-scaled trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
 However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
 Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
 \code{node.dating} is written in \emph{R} and is a recent addition to the \emph{R} package \emph{ape} \citep{APE}.
@@ -75,34 +77,35 @@ Our software, \code{node.dating}, uses a maximum likelihood approach to date the
 Previously, \emph{ape} had the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
 
 \section{Algorithm} \label{sec:alg}
-We start with a rooted phylogenetic tree with edge length equal to genetic distance and the dates when each tip of the tree was sampled.
-A simple linear regression is used to estimate the mutation rate assuming a strict molecular clock.
-To estimate the dates of the internal nodes, we follow an approach given by \cite{Felsenstein81} and inspired by \emph{TipDates} \citep{TipDates}.
+We start with a rooted phylogenetic tree with edge lengths measured in evolutionary distances and tips labeled with sampling dates.
+A simple linear regression is used to estimate the rate of evolution assuming a strict molecular clock.
+To estimate the dates of the internal nodes, we follow an approach described by \cite{Felsenstein81} and motivated by \emph{TipDates} \citep{TipDates}.
 A maximum likelihood method is applied locally to date each internal node.
 Then using these estimates, the algorithm iterates until a sufficiently approximate maximum likelihood solution is obtained.
 
 \section{Runtime and accuracy} \label{sec:tests}
-In order to test the viability of \code{node.dating}, we ran \code{node.dating} on 50 simulated trees.
-We evaluated the results of \code{node.dating} using a weighted root mean squared error (RMSE).
-The simulation method and weighted RMSE are detailed in the Supplementary Information.
-
-We compared the results of \code{node.dating} of the 50 simulated trees against a modified version of \emph{TempEst}'s (formerly \emph{Path-O-Gen}) internal node dating, \emph{LSD} using a weighted root mean squared error (RMSE).
-We also compared our results using \emph{BEAST}, but on the simulated sequences instead of their reconstructed phylogenies.
+In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees.
+All trees were rooted using the same root-to-tip method prior to date estimation using the different methods.
+%We evaluated the results using a weighted root mean squared error (RMSE).
+We compared these internal node dating results against a modified version of \emph{TempEst} v1.5 and \emph{LSD} 0.2 using the weighted root mean squared error (RMSE).
 \emph{TempEst} uses the prediction given by a linear regression to estimate the dates of the internal nodes and \emph{LSD} uses a least squares method.
+We also compared our results with \emph{BEAST} v2.3.2 using simulated sequence data as its inputs.
+Simulation and weighted RMSE methods are detailed in the Supplementary Information.
 
 %The average weighted RMSE of the MRCA using \emph{TempEst} was $132.$ days and using \emph{LSD} was $24.9$ days.
-The average RMSE's of \emph{TempEst} and \emph{LSD} are higher than the average weighted RMSE of the MRCA using \code{node.dating} with 1000 steps, though the weighted RMSE of \emph{LSD} is comparable to the RMSE of \code{node.dating}.
+The average RMSEs of \emph{TempEst} and \emph{LSD} were higher than that obtained by \code{node.dating} with 1000 steps, though the RMSE of \emph{LSD} was similar (Table \ref{tab:runtime}).
 %Overall, the RMSE of each tree using \code{node.dating} with 1000 iterations was less than the RMSE using \emph{TempEst}, suggesting that \code{node.dating} is more accurate at dating the internal nodes of phylogenetic trees.
-However, the main purpose of \emph{TempEst} is not to date internal nodes, but to detect/verify the presence of a strict molecular clock.
-We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating. \emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
-With $10^4$ steps \emph{BEAST} performed terribly and in around the same amount of time as \code{node.dating} at 100 steps.
-However, the results using \emph{BEAST} are not completely comparable since we used the sequence data for \emph{BEAST} instead of the reconstructed phylogenies.
+However, the main purpose of \emph{TempEst} is to detect or verify the presence of a strict molecular clock, not to date internal nodes.
+%We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating. 
+\emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
+In contrast, \emph{BEAST} performed poorly when limited to $10^4$ steps, requiring roughly the same amount of computing time as \code{node.dating} at 100 steps.
+However, results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
 
 \begin{table}[t]
 	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} and comparable software on 50 simulated trees}
 	\label{tab:runtime}
 	\centering
-	\begin{tabular}{lcc}
+	\begin{tabular}{lrr}
 		\hline
 		Software & Runtime (s) & RMSE (days) \\
 		\hline
@@ -110,9 +113,9 @@ However, the results using \emph{BEAST} are not completely comparable since we u
 		\code{node.dating} (1 step) & 2.26 & 26.7 \\
 		\code{node.dating} (10 steps) & 7.62 & 23.7 \\
 		\code{node.dating} (100 steps) & 62.1 & 22.8 \\
-		\code{node.dating} (1000 steps) & 596. & 22.6 \\
+		\code{node.dating} (1000 steps) & 596.0 & 22.6 \\
 		\code{node.dating} ($10^4$ steps) & 5950 & 22.1 \\
-		\emph{TempEst} & 11.2 & 132. \\
+		\emph{TempEst} & 11.2 & 132.0 \\
 		\emph{LSD} & 0.707 & 24.9 \\
 		\emph{BEAST} ($10^4$ steps) & 181 & 419. \\
 		\emph{BEAST} ($10^6$ steps) & 6840 & 20.1 \\
@@ -122,11 +125,13 @@ However, the results using \emph{BEAST} are not completely comparable since we u
 \end{table}
 
 \section{Visualization} \label{sec:vis}
-In this section, we exhibit a visualization of sequence data using the estimated dates of internal nodes.
+In this section, we provide a visualization of sequence data using the estimated dates of internal nodes.
 We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database \citep{LosAlamos}.
 This patient's sequence data was collected in \cite{Llewellyn06} as Patient 1180.
 We reconstructed the sequences' phylogenetic tree using the method described in the Supplementary Information.
-We then estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. This plot displayed shown in Figure \ref{fig:pat16617}.
+We then estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
+Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
+This plot displayed shown in Figure \ref{fig:pat16617}.
 
 \section{Future work} \label{sec:discuss}
 One drawback of our methodology is that it assumes that the phylogeny follows a strict molecular clock.
@@ -141,11 +146,13 @@ It may also be possible to incorporate this `negative' evolution into the model.
 	\label{fig:pat16617}
 \end{figure}
 
+
 \section*{Acknowledgements} \label{sec:ackn}
 We would like to thank Richard Liang for his aid in automating \emph{TempEst}.
 
 \section*{Funding} \label{sec:fund}
-This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure), by a CIHR operating grant to Art Poon (HOP-111406), and by the Bill and Melinda Gates Foundation Award Number OPP1110049.
+This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV \newpage{} Cure Research Enterprise; CanCure), by a CIHR operating grant to AFYP (HOP-111406), and by the Bill and Melinda Gates Foundation Award Number (OPP1110049).
+AFYP was supported by a CIHR New Investigator Award and by a salary award from the Michael Smith Foundation for Health Research, St.~Paul's Hospital Foundation and the Providence Health Care Research Institute.
 
 \bibliographystyle{bio}
 \bibliography{node.dating}
