@@ -44,8 +44,8 @@ $^{\text{\sf 2}}$Department of Medicine, University of British Columbia, V5Z 1M9
 Phylogenetic trees encode the evolutionary distances between species or populations.
 With sufficient information, these evolutionary distances can be rescaled over time to provide estimates of the dates of the most recent ancestors of the species.
 Here we present the $R$ software \code{node.dating}, which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
-\textbf{Availability and Implementation:} \code{node.dating} is written in $R$ and requires the $R$ package, \emph{APE}.
-\code{node.dating} is available at the GitHub repository: https://github.com/brj1/node.dating. \\
+\textbf{Availability and Implementation:} \code{node.dating} is written in $R$ and requires the $R$ package, \emph{ape}.
+\code{node.dating} is available as a part of the $R$ package \emph{ape} (cran.r-project.org). Supplementary software and tests are available at the GitHub repository: https://github.com/brj1/node.dating.  \\
 \textbf{Contact:} \href{brj1@sfu.ca}{brj1@sfu.ca}\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.}
 
@@ -70,8 +70,9 @@ In molecular epidemiology, these dates can also provide a rough approximation of
 A multitude of software has been developed to date MRCA's and create time trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
 However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
 Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
-\code{node.dating} is written in \emph{R} and is compatible with the \emph{R} package \emph{APE} \citep{APE}; it is available in the GitHub repository: https://github.com/brj1/node.dating.
-\emph{APE} has the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
+\code{node.dating} is written in \emph{R} and is a recent addition to the \emph{R} package \emph{ape} \citep{APE}.
+%; it is also available in the GitHub repository: https://github.com/brj1/node.dating.
+Previously, \emph{ape} had the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
 
 \section{Algorithm} \label{sec:alg}
 We start with a rooted phylogenetic tree with edge length equal to genetic distance and the dates when each tip of the tree was sampled.
@@ -131,7 +132,7 @@ We then estimated the dates of the internal nodes using \code{node.dating} with 
 One drawback of our methodology is that it assumes that the phylogeny follows a strict molecular clock.
 However, the local likelihood model can be extended to incorporate a variable molecular clock; future work would like to include this extension.
 The molecular clock assumption also implies that mutations \showthe\parskip are strictly additive over time, which is not true.
-It may also be possible to incorporate this ``negative'' evolution into the model.
+It may also be possible to incorporate this `negative' evolution into the model.
 
 \begin{figure}[t]
 	\centering
@@ -142,7 +143,6 @@ It may also be possible to incorporate this ``negative'' evolution into the mode
 
 \section*{Acknowledgements} \label{sec:ackn}
 We would like to thank Richard Liang for his aid in automating \emph{TempEst}.
-\newpage
 
 \section*{Funding} \label{sec:fund}
 This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure), by a CIHR operating grant to Art Poon (HOP-111406), and by the Bill and Melinda Gates Foundation Award Number OPP1110049.
