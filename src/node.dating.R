@@ -1,3 +1,7 @@
+## node.dating.R (2016-06-21)
+## This file is part of the R-package `ape'.
+## See the file COPYING in the package ape available at cran.r-project.org for licensing issues.
+
 # Copyright (c) 2016, Bradley R. Jones, BC Centre for Excellence in HIV/AIDS
 # All rights reserved.
 # 
