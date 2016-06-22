@@ -44,8 +44,10 @@ $^{\text{\sf 2}}$Department of Medicine, University of British Columbia, V5Z 1M9
 Phylogenetic trees encode the evolutionary distances between species or populations.
 With sufficient information, these evolutionary distances can be rescaled over time to provide estimates of the dates of the most recent ancestors of the species.
 Here we present the $R$ program \code{node.dating}, which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
-\textbf{Availability and Implementation:} \code{node.dating} is written in $R$ and requires the $R$ package, \emph{ape}.
-\code{node.dating} is available as a part of the $R$ package \emph{ape} (cran.r-project.org). Supplementary software and tests are available at the GitHub repository: https://github.com/brj1/node.dating.  \\
+\textbf{Availability and Implementation:}
+%\code{node.dating} is written in $R$ and requires the $R$ package, \emph{ape}.
+\code{node.dating} is available as a part of the $R$ package \emph{ape} (cran.r-project.org).
+Supplementary software and tests are available at: https://github.com/brj1/node.dating.  \\
 \textbf{Contact:} \href{brj1@sfu.ca}{brj1@sfu.ca}\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.}
 
@@ -55,8 +57,6 @@ Here we present the $R$ program \code{node.dating}, which uses a maximum likelih
 %Phylogenetics, Ancestor Dating, Linear Regression, Molecular Clock \\
 
 \underline{}
-
-\vspace * {-0.5in}
 
 \section{Introduction} \label{sec:intro}
 Phylogenetic trees represent the evolutionary relationships among populations or species through their common ancestors.  
@@ -81,7 +81,7 @@ We start with a rooted phylogenetic tree with edge lengths measured in evolution
 A simple linear regression is used to estimate the rate of evolution assuming a strict molecular clock.
 To estimate the dates of the internal nodes, we follow an approach described by \cite{Felsenstein81} and motivated by \emph{TipDates} \citep{TipDates}.
 A maximum likelihood method is applied locally to date each internal node.
-Then using these estimates, the algorithm iterates until a sufficiently approximate maximum likelihood solution is obtained.
+Then using these estimates, the algorithm iterates a specified number of times.
 
 \section{Runtime and accuracy} \label{sec:tests}
 In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees.
@@ -126,23 +126,23 @@ However, results using \emph{BEAST} are not strictly comparable since we used se
 
 \section{Visualization} \label{sec:vis}
 In this section, we provide a visualization of sequence data using the estimated dates of internal nodes.
-We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database \citep{LosAlamos}.
+We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database (http://www.hiv.lanl.gov/, accessed June 24, 2015).
 This patient's sequence data was collected in \cite{Llewellyn06} as Patient 1180.
 We reconstructed the sequences' phylogenetic tree using the method described in the Supplementary Information.
 We then estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
 Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
-This plot displayed shown in Figure \ref{fig:pat16617}.
+This plot is shown in Figure \ref{fig:pat16617}.
 
 \section{Future work} \label{sec:discuss}
 One drawback of our methodology is that it assumes that the phylogeny follows a strict molecular clock.
 However, the local likelihood model can be extended to incorporate a variable molecular clock; future work would like to include this extension.
-The molecular clock assumption also implies that mutations \showthe\parskip are strictly additive over time, which is not true.
-It may also be possible to incorporate this `negative' evolution into the model.
+The molecular clock assumption implies that mutations are strictly additive over time, which is not true.
+It may be possible to incorporate this `negative' evolution into the model.
 
-\begin{figure}[t]
+\begin{figure}[b]
 	\centering
 	\includegraphics[width=\columnwidth]{Patient_16617_gray}
-	\caption[Genetic distance versus time plot]{Genetic distance from the root versus time of the sequences from Patient 16617 from the LANL HIV database. The dates of the internal nodes were estimated using \code{node.dating} and the internal nodes are included in the plot. The edges between adjacent nodes of the tree are drawn as solid lines and the molecular clock is drawn by a dashed line.}
+	\caption[Genetic distance versus time plot]{Genetic distance from the root versus time of the sequences from Patient 16617 from the LANL HIV database. The dates of the internal nodes were estimated using \code{node.dating} and are included in the plot. The edges between adjacent nodes of the tree are drawn as solid lines and the molecular clock is drawn by a dashed line.}
 	\label{fig:pat16617}
 \end{figure}
 
@@ -151,7 +151,7 @@ It may also be possible to incorporate this `negative' evolution into the model.
 We would like to thank Richard Liang for his aid in automating \emph{TempEst}.
 
 \section*{Funding} \label{sec:fund}
-This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV \newpage{} Cure Research Enterprise; CanCure), by a CIHR operating grant to AFYP (HOP-111406), and by the Bill and Melinda Gates Foundation Award Number (OPP1110049).
+This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure), by a CIHR operating grant to AFYP (HOP-111406), and by the Bill and Melinda Gates Foundation Award Number (OPP1110049).
 AFYP was supported by a CIHR New Investigator Award and by a salary award from the Michael Smith Foundation for Health Research, St.~Paul's Hospital Foundation and the Providence Health Care Research Institute.
 
 \bibliographystyle{bio}
