@@ -17,7 +17,7 @@
     't$tip.label' or a vector of dates for all of the nodes.}
   \item{p}{p-value cutoff for failed regression.}
   \item{mu}{mutation rate.}
-  \item{min.date}{the minium bound on the dates of nodes}
+  \item{min.date}{the minimum bound on the dates of nodes.}
   \item{show.steps}{print the log likelihood every show.steps.  If 0 will supress
     output.}
   \item{opt.tol}{tolerance for optimization precision.}
@@ -44,20 +44,19 @@
   vector for all of the nodes of 't'.  'estimate.mu' will use all of the values
   given in 'node.dates' to estimate the mutation rate.  Dates can be censored with
   NA. 'node.dates' must contain all of the tip dates when it is a parameter of
-  'estimate.dates'.If only tip dates are given, then 'estimate.dates' will run an
-  initial step to estimate the dates of the initernal nodes.  If 'node.dates'
+  'estimate.dates'.  If only tip dates are given, then 'estimate.dates' will run an
+  initial step to estimate the dates of the internal nodes.  If 'node.dates'
   contains dates for some of the nodes, 'estimate.dates' will use those dates as
-  priors in the inital step.  If all of dates for nodes are given, then
+  priors in the inital step.  If all of the dates for nodes are given, then
   'estimate.dates' will not run the inital step.
 
-  'opt.tol' is used to optimize the location of the root along the best branch.  If
-  'is.binary' is set to FALSE, 'estimate.dates' uses the '"optimize"' function as
+  If 'is.binary' is set to FALSE, 'estimate.dates' uses the '"optimize"' function as
   the optimization method.  By default, R's '"optimize"' function uses a precision
   of '".Machine$double.eps^0.25"', which is about 0.0001 on a 64-bit system.  This
   should be set to a smaller value if the branch lengths of 't' are very short.  If
-  'is.binary; is set to TRUE, estimate dates uses calclus to deterimine the maximum
-  likelihood at each step. The bounds of permissible values are reduced by
-  'opt.tol'.
+  'is.binary' is set to TRUE, estimate dates uses calculus to deterimine the maximum
+  likelihood at each step, which is faster. The bounds of permissible values are 
+  reduced by 'opt.tol'.
 
   'estimate.dates' has several criteria to decide how many steps it will run.  If
   'lik.tol' and 'nsteps' are both 0, then 'estimate.dates' will only run the initial
@@ -86,20 +85,21 @@
   (2016). preprint.
 }
 \seealso{
-	\code{\link{optimize}, \link{rtt}}
+  \code{\link{optimize}, \link{rtt}}
 }
 \examples{
 t <- rtree(100)
-tip.date <- rnorm(t$tip.label, mean=node.depth.edgelength(t)[1:length(t$tip.label)])^2
+tip.date <- rnorm(t$tip.label, mean = node.depth.edgelength(t)[1:Ntip(t)])^2
 t <- rtt(t, tip.date)
 mu <- estimate.mu(t, tip.date)
 
-## Run for 1000 steps
-node.date <- estimate.dates(t, tip.date, mu)
+## Run for 100 steps
+node.date <- estimate.dates(t, tip.date, mu, nsteps = 100)
 
-## Run until the difference between successive log likelihoods is less than $10^{-8}$ starting with the 1000th step's results
-node.date <- estimate.dates(t, node.date, mu, nsteps=0, lik.tol=1e-4)
+## Run until the difference between successive log likelihoods is
+## less than $10^{-4}$ starting with the 100th step's results
+node.date <- estimate.dates(t, node.date, mu, nsteps = 0, lik.tol = 1e-4)
 
 ## To rescale the tree over time
-t$edge.length <- unlist(apply(t$edge, 1, function(x) node.date[x[2]] - node.date[x[1]]))
+t$edge.length <- node.date[t$edge[, 2]] - node.date[t$edge[, 1]]
 }
