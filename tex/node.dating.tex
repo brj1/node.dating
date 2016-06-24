@@ -1,5 +1,5 @@
 \documentclass{bioinfo}
-\copyrightyear{2016} \pubyear{2017}
+\copyrightyear{2016} \pubyear{XXXX}
 
 \access{Advance Access Publication Date: Day Month Year}
 \appnotes{Application Note}
@@ -10,7 +10,7 @@
 \usepackage{comment}
 
 \usepackage{graphicx}
-\graphicspath{{./figures/}}
+\graphicspath{{./figures/}{./}}
 
 %\usepackage{xr}
 %\externaldocument{si-node.dating}
@@ -19,13 +19,10 @@
 
 \newcommand{\code}[1]{{\tt #1}}
 
-
 \begin{document}
 \firstpage{1}
 
 \subtitle{}
-
-
 
 \title[node.dating]{node.dating: dating ancestors in phylogenetic trees in R}
 \author[Jones \textit{et~al}.]{Bradley R. Jones\,$^{\text{\sfb 1, 2,}*}$ and Art F. Y. Poon\,$^{\text{\sfb 2,3}}$}
@@ -58,6 +55,8 @@ Supplementary software and tests are available at: https://github.com/brj1/node.
 
 \underline{}
 
+\vspace*{-25pt}
+
 \section{Introduction} \label{sec:intro}
 Phylogenetic trees represent the evolutionary relationships among populations or species through their common ancestors.  
 %(Ways to make trees \citep{Raxml14}).
@@ -67,7 +66,8 @@ However, when there is external information available on the location of nodes i
 %The nodes of a time tree also carry a time value which for the tips of the tree represent the sampling time of the tip's sequence.
 Thus, the internal nodes of a time-scaled tree estimate the dates that the respective lineages diverged from their common ancestor \citep{Kumar16}.
 These date estimates are an important resource for reconstructing the evolutionary history of species \citep{Shapiro04}.
-In molecular epidemiology, these dates can also provide a rough approximation of transmission times during an outbreak of infectious disease \citep{Ypma13}.
+In molecular epidemiology, these dates can also provide a rough approximation of transmission times during an outbreak of infectious disease 
+\citep{Ypma13}.
 
 A multitude of software has been developed to reconstruct ancestral dates and create time-scaled trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
 However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
@@ -76,12 +76,16 @@ Our software, \code{node.dating}, uses a maximum likelihood approach to date the
 %; it is also available in the GitHub repository: https://github.com/brj1/node.dating.
 Previously, \emph{ape} had the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
 
+\vspace*{-15pt}
+
 \section{Algorithm} \label{sec:alg}
 We start with a rooted phylogenetic tree with edge lengths measured in evolutionary distances and tips labeled with sampling dates.
 A simple linear regression is used to estimate the rate of evolution assuming a strict molecular clock.
 To estimate the dates of the internal nodes, we follow an approach described by \cite{Felsenstein81} and motivated by \emph{TipDates} \citep{TipDates}.
 A maximum likelihood method is applied locally to date each internal node.
 Then using these estimates, the algorithm iterates a specified number of times.
+
+\vspace*{-15pt}
 
 \section{Runtime and accuracy} \label{sec:tests}
 In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees.
@@ -124,6 +128,8 @@ However, results using \emph{BEAST} are not strictly comparable since we used se
 	\end{tabular}
 \end{table}
 
+\vspace*{-15pt}
+
 \section{Visualization} \label{sec:vis}
 In this section, we provide a visualization of sequence data using the estimated dates of internal nodes.
 We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database (http://www.hiv.lanl.gov/, accessed June 24, 2015).
@@ -133,6 +139,8 @@ We then estimated the dates of the internal nodes using \code{node.dating} with 
 Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
 This plot is shown in Figure \ref{fig:pat16617}.
 
+\vspace*{-15pt}
+
 \section{Future work} \label{sec:discuss}
 One drawback of our methodology is that it assumes that the phylogeny follows a strict molecular clock.
 However, the local likelihood model can be extended to incorporate a variable molecular clock; future work would like to include this extension.
@@ -141,14 +149,17 @@ It may be possible to incorporate this `negative' evolution into the model.
 
 \begin{figure}[b]
 	\centering
-	\includegraphics[width=\columnwidth]{Patient_16617_gray}
+	\includegraphics[width=\columnwidth]{patient_16617}
 	\caption[Genetic distance versus time plot]{Genetic distance from the root versus time of the sequences from Patient 16617 from the LANL HIV database. The dates of the internal nodes were estimated using \code{node.dating} and are included in the plot. The edges between adjacent nodes of the tree are drawn as solid lines and the molecular clock is drawn by a dashed line.}
 	\label{fig:pat16617}
 \end{figure}
 
+\vspace*{-15pt}
 
 \section*{Acknowledgements} \label{sec:ackn}
 We would like to thank Richard Liang for his aid in automating \emph{TempEst}.
+
+\vspace*{-15pt}
 
 \section*{Funding} \label{sec:fund}
 This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure), by a CIHR operating grant to AFYP (HOP-111406).
@@ -156,6 +167,86 @@ Research reported in this publication was partially supported by the Bill and Me
 AFYP was supported by a CIHR New Investigator Award and by a salary award from the Michael Smith Foundation for Health Research, St.~Paul's Hospital Foundation and the Providence Health Care Research Institute.
 
 \bibliographystyle{bio}
-\bibliography{node.dating}
+\begin{thebibliography}{14}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem[{Drummond and Rodrigo(2000)}]{UPGMA}
+Drummond, A. and Rodrigo, R., A~G (2000) Reconstructing genealogies of serial
+  samples under the assumption of a molecular clock using serial-sample
+  {UPGMA}.
+\newblock \emph{Molecular Biology and Evolution}, 17(12), 1807--1815.
+
+\bibitem[{Drummond and Rambaut(2007)}]{BEAST}
+Drummond, A.~J. and Rambaut, A. (2007) {BEAST}: {Bayesian} evolutionary
+  analysis by sampling trees.
+\newblock \emph{BMC Evolutionary Biology}, 7, 214.
+
+\bibitem[{Felsenstein(1981)}]{Felsenstein81}
+Felsenstein, J. (1981) Evolutionary trees from {DNA} sequences: a maximum
+  likelihood approach.
+\newblock \emph{Journal of Molecular Evolution}, 17, 368--376.
+
+\bibitem[{Kumar and Hedges(2016)}]{Kumar16}
+Kumar, S. and Hedges, S.~B. (2016) Advances in time estimation methods for
+  molecular data.
+\newblock \emph{Molecular Biology and Evolution}, 33(4), 863--869.
+
+\bibitem[{Llewellyn et~al.(2006)}]{Llewellyn06}
+Llewellyn, N. et~al. (2006) Continued evolution of {HIV-1} circulating in blood
+  monocytes with antiretroviral therapy: genetic analysis of {HIV-1} in
+  monocytes and {CD4+} {T} cells of patients with discontinued therapy.
+\newblock \emph{J Leukoc Biol}, 80(5), 1118--1126.
+
+\bibitem[{Paradis et~al.(2004)}]{APE}
+Paradis, E. et~al. (2004) {APE}: analyses of phylogenetics and evolution in {R}
+  language.
+\newblock \emph{Bioinformatics}, 20(2), 289--290.
+
+\bibitem[{Rambaut(2000)}]{TipDates}
+Rambaut, A. (2000) Estimating the rate of molecular evolution: incorporating
+  non-contemporaneous sequences into maximum likelihood phylogenies.
+\newblock \emph{Bioinformatics}, 16(4), 395--399.
+
+\bibitem[{Rambaut et~al.(2016)}]{Tempest}
+Rambaut, A. et~al. (2016) Exploring the temporal structure of heterochronous
+  sequences using {TempEst} (formerly {Path-O-Gen}).
+\newblock \emph{Virus Evolution}, 2, vew007.
+
+\bibitem[{Sanderson(2003)}]{r8ts}
+Sanderson, M.~J. (2003) {r8s}: inferring absolute rates of molecular evolution
+  and divergence times in the absence of a molecular clock.
+\newblock \emph{Bioinformatics}, 19(2), 301--302.
+
+\bibitem[{Shapiro et~al.(2004)}]{Shapiro04}
+Shapiro, B. et~al. (2004) Rise and fall of the {Beringian Steppe} bison.
+\newblock \emph{Science}, 306, 1561--1565.
+
+\bibitem[{To et~al.(2016)}]{LSD}
+To, T.-H. et~al. (2016) Fast dating using least-squares criteria and
+  algorithms.
+\newblock \emph{Systematic Biology}, 65(1), 82--97.
+
+\bibitem[{Yang(2007)}]{PAML}
+Yang, Y. (2007) {PAML} 4: phylogenetic analysis by maximum likelihood.
+\newblock \emph{Molecular Biology and Evolution}, 24(8), 1585--1591.
+
+\bibitem[{Yang et~al.(2007)}]{TREBLE}
+Yang, Z. et~al. (2007) Tree and rate estimation by local evaluation of
+  heterochronous nucleotide data.
+\newblock \emph{Bioinformatics}, 23(2), 169--176.
+
+\bibitem[{Ypma et~al.(2013)}]{Ypma13}
+Ypma, R. J.~F. et~al. (2013) Relating phylogenetic trees to transmission trees
+  of infectious disease outbreaks.
+\newblock \emph{Genetics}, 195(3), 1055--1062.
+
+\end{thebibliography}
+
 
 \end{document}

@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass{article}
 
 \usepackage[margin=2cm]{geometry}
 \usepackage{colortbl}
@@ -41,7 +41,7 @@ To verify the accuracy of \code{node.dating}, we applied it to simulated data.
 We simulated 50 phylogenetic trees with 100 tips each using a birth-death model with the \emph{R} package \emph{TreeSim} \citep{TreeSim} using the parameters: $\lambda = 5.116 \times 10^{-2}$ day$^{-1}$, $\delta = 5.006 \times 10^{-2}$ day$^{-1}$, and $s = 5.237 \times 10^{-3}$.
 We then applied a strict molecular clock to the trees with the \emph{R} package \emph{NELSI} \citep{NELSI} using the parameters: $\mu = \ 1.964\times 10^{-4}$ and $\sigma = \ 1.417\times 10^{-5}$ substitutions per generation.
 We used these trees to simulate HIV sequences with \emph{INDELible} 1.03 \citep{Indelible09} using a HKY85 nucleotide substitution model \cite{HKY85} with a stationary distribution of 0.42, 0.15, 0.15, 0.28 for A, C, G, T respectively and a transitional bias of $\kappa = 8.5$.
-Finally we reconstructed phylogenetic trees from the sequences using \emph{RAxML} version 8.2.4 \citep{Raxml14} with the GTR model and rooted the trees using the \code{rtt} function of the \emph{R} package, \emph{APE} \citep{APE}.
+Finally we reconstructed phylogenetic trees from the sequences using \emph{RAxML} version 8.2.4 \citep{Raxml14} with the GTR model and rooted the trees using the \code{rtt} function of the \emph{R} package, \emph{ape} \citep{APE}.
 This process is engineered to replicate phylogenetic trees derived from real data.
 
 \section{Weighted RMSE} \label{sec:rmse}
@@ -60,7 +60,7 @@ For our analysis we considered the mean of the RMSE of all 50 phylogenies.
 We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database \\ (http://www.hiv.lanl.gov/, accessed June 24, 2015; Patient 1180 from \cite{Llewellyn06}).
 Sequences were aligned using MUSCLE version 3.8.31 \cite{Muscle04} and inspected and cleaned using AliView \citep{AliView14}. 
 We trimmed the alignments so that each sequence had at least 50\% coverage over each base.
-We reconstructed the phylogeny of the patient's sequences using \emph{RAxML} version 8.2.4 \citep{Raxml14} and rooted the tree using the \code{rtt} function of APE \citep{APE}.
+We reconstructed the phylogeny of the patient's sequences using \emph{RAxML} version 8.2.4 \citep{Raxml14} and rooted the tree using the \code{rtt} function of \emph{ape} \citep{APE}.
 
 \bibliographystyle{bio}
 \bibliography{node.dating}
