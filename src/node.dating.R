@@ -71,7 +71,8 @@ estimate.mu <- function(t, node.dates, p = 0.05) {
 # node.dates: either a vector of dates for the tips, in the same order as 
 #             t$tip.label; or a vector of dates to initalize each node
 #
-# mu: mutation rate
+# mu: mutation rate, either a vector of size one for a strict molecular clock
+#     or a vector with a local molecular clock along each edge
 #
 # min.date: the minimum date that a node can have (needed for optimize()). The 
 #           default is -.Machine$double.xmax
@@ -98,8 +99,10 @@ estimate.mu <- function(t, node.dates, p = 0.05) {
 #
 # returns a vector of all of the dates of the tips and nodes
 estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t)) {
-	if (mu < 0)
+	if (any(mu < 0))
 		stop(paste("mu (", mu, ") less than 0", sep=""))
+		
+	mu <- if (length(mu) == 1) rep(mu, length(t$edge.length)) else mu
 
 	# init vars
 	n.tips <- length(t$tip.label)
@@ -119,18 +122,18 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 	
 	children <- lapply(1:t$Nnode,
 		function(x) {
-			t$edge[,1] == x + n.tips
+			which(t$edge[,1] == x + n.tips)
 		})
 	parent <- lapply(1:t$Nnode,
 		function(x) {
-			t$edge[,2] == x + n.tips
+			which(t$edge[,2] == x + n.tips)
 		})
 		
 	# to process children before parents
 	nodes <- c(1)
 	i <- 1
 	
-	while (i <= length(nodes)) {
+	while (i <= length(nodes)) {                                                                                                                                                                                                                                                                                                                                                                            
 		nodes <- c(nodes, t$edge[t$edge[,1] == nodes[i] + n.tips, 2] - n.tips)
 		
 		i <- i + 1
@@ -144,27 +147,27 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		
 	calc.Like <- function(ch.node, ch.edge, x) {
 		tim <- ch.node - x
-				
-		ch.edge*log(tim)-mu*tim
+						
+		t$edge.length[ch.edge]*log(tim)-mu[ch.edge]*tim
 	}
 		
-	opt.fun <- function(x, ch, p, ch.edge.length, p.edge.length, use.parent=T) {	
+	opt.fun <- function(x, ch, p, ch.edge, p.edge, use.parent=T) {	
 		sum(if (!use.parent || length(dates[p]) == 0 || is.na(dates[p])) {		
-				calc.Like(dates[ch], ch.edge.length, x)
+				calc.Like(dates[ch], ch.edge, x)
 			} else {
-				calc.Like(c(dates[ch], x), c(ch.edge.length, p.edge.length), c(rep(x, length(dates[ch])), dates[p]))
+				calc.Like(c(dates[ch], x), c(ch.edge, p.edge), c(rep(x, length(dates[ch])), dates[p]))
 			})
 	}
 	
-	solve.bin <- function(bounds, ch.times, ch.edge.length) {
-		a <- 2 * mu
-		b <- ch.edge.length[1] + ch.edge.length[2] - 2 * mu * (ch.times[1] + ch.times[2])
-		c.0 <- 2*mu*ch.times[1] * ch.times[2] - ch.times[1] * ch.edge.length[2] - ch.times[2] * ch.edge.length[1]
+	solve.bin <- function(bounds, ch.times, ch.edge) {
+		ch.edge.length <- t$edge.length[ch.edge]
 		
-		b ^ 2 - 4 * a * c.0 < 0
-		
+		a <- sum(mu[ch.edge])
+		b <- ch.edge.length[1] + ch.edge.length[2] - a * (ch.times[1] + ch.times[2])
+		c.0 <- a*ch.times[1] * ch.times[2] - ch.times[1] * ch.edge.length[2] - ch.times[2] * ch.edge.length[1]
+						
 		if (b ^ 2 - 4 * a * c.0 < 0) {		
-			return(bounds[1 + (sum(calc.Like(ch.times, ch.edge.length, bounds[2] - opt.tol)) > sum(calc.Like(ch.times, ch.edge.length, bounds[1] + opt.tol)))])
+			return(bounds[1 + (sum(calc.Like(ch.times, ch.edge, bounds[2] - opt.tol)) > sum(calc.Like(ch.times, ch.edge, bounds[1] + opt.tol)))])
 		}
 		else {
 			x.1 <- (-b + sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
@@ -175,17 +178,20 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 				x <- c(x, x.1)
 			if (bounds[1] < x.2 && x.2 < bounds[2])
 				x <- c(x, x.2)
-		 	
-			return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge.length, y)))))])
+		 			 	
+			return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge, y)))))])
 		}
 	}
 	
-	solve.cube <- function(bounds, ch.times, ch.edge.length, par.time, par.edge.length) {
-		a <- mu
-		b <- sum(ch.edge.length) + par.edge.length - mu * (sum(ch.times) + par.time)
-		c.0 <- mu * (ch.times[1] * ch.times[2] + ch.times[1] * par.time + ch.times[2] * par.time) - (ch.times[1] + ch.times[2]) * par.edge.length - (ch.times[1] + par.time) * ch.edge.length[2] - (ch.times[2] + par.time) * ch.edge.length[1]
-		d <- ch.edge.length[1] * ch.times[2] * par.time + ch.edge.length[2] * ch.times[1] * par.time + par.edge.length * ch.times[1] * ch.times[2] - mu * prod(ch.times) * par.time
-		
+	solve.cube <- function(bounds, ch.times, ch.edge, par.time, par.edge) {
+		ch.edge.length <- t$edge.length[ch.edge]
+		par.edge.length <- t$edge.length[par.edge]
+	
+		a <- sum(mu[ch.edge]) - mu[par.edge]
+		b <- sum(ch.edge.length) + par.edge.length - a * (sum(ch.times) + par.time)
+		c.0 <- a * (ch.times[1] * ch.times[2] + ch.times[1] * par.time + ch.times[2] * par.time) - (ch.times[1] + ch.times[2]) * par.edge.length - (ch.times[1] + par.time) * ch.edge.length[2] - (ch.times[2] + par.time) * ch.edge.length[1]
+		d <- ch.edge.length[1] * ch.times[2] * par.time + ch.edge.length[2] * ch.times[1] * par.time + par.edge.length * ch.times[1] * ch.times[2] - a * prod(ch.times) * par.time
+				
 		delta.0 <- complex(real=b^2 - 3 * a * c.0)
 		delta.1 <- complex(real=2 * b^3 - 9 * a * b * c.0 + 27 * a^2 * d)
 		C <- ((delta.1 + sqrt(delta.1^2 - 4 * delta.0^3)) / 2)^(1/3)
@@ -202,15 +208,15 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		if (bounds[1] < x.3 && x.3 < bounds[2])
 			x <- c(x, x.3)
 		
-		return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge.length, par.edge.length), c(y, y, par.time))))))])
+		return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge, par.edge), c(y, y, par.time))))))])
 	}
 	
 	estimate <- function(node) {
-		ch <- t$edge[children[[node]], 2]
-		ch.edge.length <- t$edge.length[children[[node]]]
-				
-		p <- t$edge[parent[[node]], 1]
-		p.edge.length <- t$edge.length[parent[[node]]]
+		ch.edge <- children[[node]]
+		ch <- t$edge[ch.edge, 2]
+		
+		p.edge <- parent[[node]]
+		p <- t$edge[p.edge, 1]
 		
 		m <- if (length(p) == 0 || is.na(dates[p])) {
 				min.date
@@ -220,12 +226,12 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 			
 		if (is.binary) {
 			if (length(dates[p]) == 0 || is.na(dates[p]))
-				solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge.length)
+				solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge)
 			else 
-				solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge.length, dates[p], p.edge.length)
+				solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge, dates[p], p.edge)
 		}
-		else {		
-			res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge.length, p.edge.length, maximum=T)
+		else {				
+			res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge, p.edge, maximum=T)
 		
 			res$maximum
 		}
@@ -239,16 +245,8 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		for (n in nodes) {		
 			dates[n + n.tips] <- estimate(n)
 		}
-		
-		new.lik <- sum(unlist(lapply(nodes, function(node) {
-				ch <- t$edge[children[[node]], 2]
-				ch.edge.length <- t$edge.length[children[[node]]]
 				
-				p <- t$edge[parent[[node]], 1]
-				p.edge.length <- t$edge.length[parent[[node]]]
-				
-				opt.fun(dates[node+n.tips], ch, p, ch.edge.length, p.edge.length, use.parent=F)
-			}))) + scale.lik
+		new.lik <- sum(calc.Like(dates[tree$edge[,2]], 1:length(tree$edge.length), dates[tree$edge[,1]])) + scale.lik
 		
 		if (show.steps > 0 && ((iter.step %% show.steps) == 0)) {
 			cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
@@ -276,4 +274,5 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 	
 	dates
 }
+
 

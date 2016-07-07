@@ -13,14 +13,14 @@
 #
 # returns the log likelihood as a double
 tree.like <- function(tree, node.dates, mu) {
-	if (mu < 0)
+	if (any(mu < 0))
 		return(-Inf)
 	
 	scale.lik <- sum(-lgamma(tree$edge.length+1)+(tree$edge.length+1)*log(mu))
 		
 	calc.lik <- function(ch.node, edge, par.node) {
 		tim <- ch.node - par.node
-				
+						
 		edge*log(tim)-mu*tim
 	}
 			
