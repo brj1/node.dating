@@ -29,4 +29,4 @@ par(mar=c(4.5,5.1,2.2,1))
 
 plot.time.tree(tree, col.tip=mark.dna(tree, "#6600aa66", "#00aa6666"), pch.tip=mark.dna(tree, 16, 15), xlab="Time since first sample (days)", ylab="Genetic distance from root (subs. per base)", cex.axis=2, cex.lab=2.5, cex=1.2)
 
-legend(-240, .165, c("RNA samples", "DNA samples", "Internal nodes"), col=c("#00aa66ff", "#6600aaff", "#aa6600ff"), pch=c(16, 15, 5), cex=2.5)
+legend(-240, .165, c("RNA samples", "DNA samples", "Internal nodes"), col=c("#6600aaff", "#00aa66ff", "#aa6600ff"), pch=c(16, 15, 5), cex=2.5)
