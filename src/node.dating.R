@@ -40,28 +40,22 @@ library(ape)
 
 # Estimate the mutation rate of a phylogenetic tree from the tip dates using 
 # linear regression. This model assumes that the tree follows a molecular 
-# clock. It will produce a warning if the regression cannot reject the null
-# hypothesis.
+# clock.
 #
 # t: rooted tree with edge lengths equal to genetic distance
 #
 # tip.dates: vector of dates for the tips, in the same order as t$tip.label.
 #            Tip dates can be censored with NA values
 #
-# p: p-value cutoff for failed regression (default=0.05)
-#
-# returns the mutation rate as a double
-estimate.mu <- function(t, node.dates, p = 0.05) {
+# returns a list containing the tree, the date of the root, the mutation rate,
+# the log likelihood of the linear regression and the log likelihood of the
+# null model (mu=0)
+estimate.mu <- function(t, node.dates) {
 	# fit linear model
 	g <- glm(node.depth.edgelength(t)[1:length(node.dates)] ~ node.dates, na.action=na.omit)
 	null.g <- glm(node.depth.edgelength(t)[1:length(node.dates)] ~ 1, na.action=na.omit)
-
-	# test fit
-	if ((1 - pchisq(AIC(null.g) - AIC(g) + 2, df=1)) > p) {
-		warning(paste("Cannot reject null hypothesis (p=", (1 - pchisq(AIC(null.g) - AIC(g) + 2, df=1)), ")", sep=""))
-	}
-		
-	coef(g)[[2]]
+	
+	list(tree=t, root.date=coef(g)[[1]], mu=ceof(g)[[2]], logLik=logLik(g), null.logLik(null.g))
 }
 
 # Estimate the dates of the internal nodes of a phylogenetic tree.
@@ -97,8 +91,9 @@ estimate.mu <- function(t, node.dates, p = 0.05) {
 # If lik.tol and nsteps are both 0 then estimate.dates will only run the inital 
 # step.
 #
-# returns a vector of all of the dates of the tips and nodes
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t)) {
+# returns a list containing the tree, a vector of the estimated dates of the 
+# tips and internal nodes, the mutation rate and the log likelihood of the tree
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t)) {
 	if (any(mu < 0))
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 		
@@ -272,7 +267,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
 	}
 	
-	dates
+	list(tree=t, node.date=dates, mu=mu, logLik=new.lik)
 }
 
 
