@@ -1,6 +1,8 @@
 library(ape)
 library(data.table)
 
+source("../../src/node.dating.R")
+
 tree.like <- function(tree, node.dates, mu) {
 	if (mu < 0)
 		return(-Inf)
@@ -25,7 +27,7 @@ rmse <- function(x, y) sqrt(sum((x-y)^2)/length(x))
 
 clock <- function(tree, rate, noise) rnorm(tree$edge.length, mean=tree$edge.length * rate, sd=noise)
 
-write.csv(data.frame(tips=c(), noise=c(), steps=c(), likelihood=c(), rmse=c(), time=c()), file="trial.csv")
+write.table(data.frame(tips="tips", noise="noise", steps="steps", likelihood="likelihood", rmse="rmse", time="time"), col.names=F, row.names=F, file="trial.csv", sep=",")
 
 supress <- lapply(sds, function(s) {
 		cat(paste0("\nnoise: ", s,"\n"))
@@ -63,5 +65,5 @@ supress <- lapply(sds, function(s) {
 				data.frame(tips=rep(n, 11), noise=rep(s, 11), steps=100*(0:10), likelihood=liks, rmse=rmses, time=times)
 			}))
 			
-		write.csv(tab, file="trial.csv", col.names=F, row.names=F, append=T)
+		write.table(tab, file="trial.csv", col.names=F, row.names=F, append=T, sep=",")
 	})

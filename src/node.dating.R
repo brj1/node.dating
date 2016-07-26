@@ -109,13 +109,11 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		} else {
 			node.dates
 		}
+		
+	lik.sens <- if (lik.tol == 0) opt.tol else lik.tol
 	
 	# Don't count initial step if all values are seeded
-	iter.step <-  if (any(is.na(dates))) {
-			0
-		} else {
-			1
-		}
+	iter.step <-  if (any(is.na(dates))) 0 else 1
 	
 	children <- lapply(1:t$Nnode,
 		function(x) {
@@ -258,7 +256,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 			if (is.infinite(lik) || is.infinite(new.lik)) {
 				warning("Likelihood infinite")
 			}
-			else if (!is.na(lik) && new.lik < lik - lik.tol) {
+			else if (!is.na(lik) && new.lik + lik.sens < lik) {			
 				warning("Likelihood less than previous estimate")
 			}
 					
