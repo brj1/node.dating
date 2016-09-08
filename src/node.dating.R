@@ -239,7 +239,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, mi
 			dates[n + n.tips] <- estimate(n)
 		}
 				
-		new.lik <- sum(calc.Like(dates[tree$edge[,2]], 1:length(tree$edge.length), dates[tree$edge[,1]])) + scale.lik
+		new.lik <- sum(calc.Like(dates[t$edge[,2]], 1:length(t$edge.length), dates[t$edge[,1]])) + scale.lik
 		
 		if (show.steps > 0 && ((iter.step %% show.steps) == 0)) {
 			cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
