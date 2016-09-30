@@ -101,7 +101,6 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, mi
 
 	# init vars
 	n.tips <- length(t$tip.label)
-	nodes <- unique(reorder(t)$edge[,1])
 	dates <- if (length(node.dates) == n.tips) {
 			c(node.dates, rep(NA, t$Nnode))
 		} else {
@@ -124,31 +123,29 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, mi
 		
 	# to process children before parents
 	nodes <- c(1)
-	i <- 1
+	for (i in 1:t$Nnode) {
+		to.add <- t$edge[children[[nodes[i]]], 2] - n.tips
 	
-	while (i <= length(nodes)) {                                                                                                                                                                                                                                                                                                                                                                            
-		nodes <- c(nodes, t$edge[t$edge[,1] == nodes[i] + n.tips, 2] - n.tips)
+		nodes <- c(nodes, to.add[to.add > 0])
 		
 		i <- i + 1
 	}
-	
-	nodes <- nodes[nodes > 0]
 	nodes <- rev(nodes)
 		
-	# calculate likelihood
+	# calculate likelihood functions
 	scale.lik <- sum(-lgamma(t$edge.length+1)+(t$edge.length+1)*log(mu))
-		
+	
 	calc.Like <- function(ch.node, ch.edge, x) {
 		tim <- ch.node - x
 						
 		t$edge.length[ch.edge]*log(tim)-mu[ch.edge]*tim
 	}
-		
-	opt.fun <- function(x, ch, p, ch.edge, p.edge, use.parent=T) {	
+	
+	opt.fun <- function(x, ch, p, ch.edge, p.edge, use.parent=T) {
 		sum(if (!use.parent || length(dates[p]) == 0 || is.na(dates[p])) {		
-				calc.Like(dates[ch], ch.edge, x)
+				calc.Like(dates[ch], ch.edge.length, x)
 			} else {
-				calc.Like(c(dates[ch], x), c(ch.edge, p.edge), c(rep(x, length(dates[ch])), dates[p]))
+				calc.Like(c(dates[ch], x), c(ch.edge.length, p.edge.length), c(rep(x, length(dates[ch])), dates[p]))
 			})
 	}
 	
