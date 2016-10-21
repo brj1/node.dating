@@ -1,6 +1,7 @@
 \name{node.dating}
 \alias{estimate.mu}
 \alias{estimate.dates}
+\alias{node.dating}
 \title{node.dating}
 \description{
   Estimate the dates of a rooted phylogenetic tree from the tip dates.

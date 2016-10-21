@@ -8,6 +8,10 @@
 %\usepackage{tikz}
 \usepackage{nicefrac}
 \usepackage{comment}
+\usepackage{color}
+
+\usepackage{soul}
+\sethlcolor{red}
 
 \usepackage{graphicx}
 \graphicspath{{./figures/}{./}}
@@ -18,6 +22,8 @@
 \usepackage{float}
 
 \newcommand{\code}[1]{{\tt #1}}
+
+\newcommand{\edit}[1]{\hl{#1}}
 
 \begin{document}
 \firstpage{1}
@@ -40,11 +46,11 @@ $^{\text{\sf 2}}$Department of Medicine, University of British Columbia, V5Z 1M9
 \textbf{Summary:}
 Phylogenetic trees encode the evolutionary distances between species or populations.
 With sufficient information, these evolutionary distances can be rescaled over time to provide estimates of the dates of the most recent ancestors of the species.
-Here we present the $R$ program \code{node.dating}, which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
+Here we present the \emph{R} program \code{node.dating}, \edit{divergence-time analysis software},  which uses a maximum likelihood method to estimate the dates of the internal nodes of a phylogenetic tree. \\
 \textbf{Availability and Implementation:}
 %\code{node.dating} is written in $R$ and requires the $R$ package, \emph{ape}.
-\code{node.dating} is available as a part of the $R$ package \emph{ape} (cran.r-project.org).
-Supplementary software and tests are available at: https://github.com/brj1/node.dating.  \\
+\code{node.dating} is available as a part of the \emph{R} \edit{v3.30} package \emph{ape} \edit{v3.6} (cran.r-project.org).
+\edit{{\tt node.dating} is also available in the GitHub repository: } https://github.com/brj1/node.dating\edit{, along with supplementary software and tests.}  \\
 \textbf{Contact:} \href{brj1@sfu.ca}{brj1@sfu.ca}\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.}
 
@@ -69,49 +75,55 @@ These date estimates are an important resource for reconstructing the evolutiona
 In molecular epidemiology, these dates can also provide a rough approximation of transmission times during an outbreak of infectious disease 
 \citep{Ypma13}.
 
-A multitude of software has been developed to reconstruct ancestral dates and create time-scaled trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
+A multitude of \edit{divergence-time analysis} software has been developed to reconstruct ancestral dates and create time-scaled trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
 However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
 Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
-\code{node.dating} is written in \emph{R} and is a recent addition to the \emph{R} package \emph{ape} \citep{APE}.
+\code{node.dating} is written in \emph{R} \edit{v3.30} and is a recent addition to the \emph{R} package \emph{ape} \edit{v3.6} \citep{APE}.
 %; it is also available in the GitHub repository: https://github.com/brj1/node.dating.
 Previously, \emph{ape} had the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
 
-\vspace*{-15pt}
+\vspace*{-18pt}
 
 \section{Algorithm} \label{sec:alg}
-We start with a rooted phylogenetic tree with edge lengths measured in evolutionary distances and tips labeled with sampling dates.
+We start with a rooted phylogenetic tree with edge lengths measured in evolutionary distances and tips \edit{with heterochronous} dates.
 A simple linear regression is used to estimate the rate of evolution assuming a strict molecular clock.
 To estimate the dates of the internal nodes, we follow an approach described by \cite{Felsenstein81} and motivated by \emph{TipDates} \citep{TipDates}.
 A maximum likelihood method is applied locally to date each internal node.
 Then using these estimates, the algorithm iterates a specified number of times.
 
-\vspace*{-15pt}
+\vspace*{-18pt}
 
 \section{Runtime and accuracy} \label{sec:tests}
-In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees.
-All trees were rooted using the same root-to-tip method prior to date estimation using the different methods.
+In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees with 100 tips each \edit{and simulated time span around 2400 days, similar to real within-patient HIV sequences.}
+%All trees were rooted using the same root-to-tip method prior to date estimation using the different methods.
 %We evaluated the results using a weighted root mean squared error (RMSE).
-We compared these internal node dating results against a modified version of \emph{TempEst} v1.5 and \emph{LSD} 0.2 using the weighted root mean squared error (RMSE).
+We compared these internal node dating results against a modified version of \emph{TempEst} v1.5 and \emph{LSD} 0.2 using \edit{a} weighted root mean squared error (RMSE).
 \emph{TempEst} uses the prediction given by a linear regression to estimate the dates of the internal nodes and \emph{LSD} uses a least squares method.
-We also compared our results with \emph{BEAST} v2.3.2 using simulated sequence data as its inputs.
-Simulation and weighted RMSE methods are detailed in the Supplementary Information.
+We also compared our results with \emph{BEAST} v2.3.2 \edit{with a birth death skyline serial prior (Stadler et~al., 2013) and a strict clock model} using simulated sequence data as its inputs.
+\edit{The simulation method and weighted RMSE} are detailed in the Supplementary Information.
 
+\edit{The RMSE of {\tt node.dating} converged within 1 unit of its optimum RMSE of $22.1$ within 100 steps.
+This quick convergence appears to be independant of data size as can be seen in supplementary trials found on the GitHub repository, https://github.com/brj1/node.dating.}
 %The average weighted RMSE of the MRCA using \emph{TempEst} was $132.$ days and using \emph{LSD} was $24.9$ days.
-The average RMSEs of \emph{TempEst} and \emph{LSD} were higher than that obtained by \code{node.dating} with 1000 steps, though the RMSE of \emph{LSD} was similar (Table \ref{tab:runtime}).
+The\edit{ }RMSE\edit{} of \emph{TempEst} \edit{was} higher than that obtained by \code{node.dating} with \edit{any number of} steps\edit{.}
 %Overall, the RMSE of each tree using \code{node.dating} with 1000 iterations was less than the RMSE using \emph{TempEst}, suggesting that \code{node.dating} is more accurate at dating the internal nodes of phylogenetic trees.
-However, the main purpose of \emph{TempEst} is to detect or verify the presence of a strict molecular clock, not to date internal nodes.
-%We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating. 
+However, The main purpose of \emph{TempEst} is to detect or verify the presence of a strict molecular clock, not to date internal nodes.
+%We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating.
+\edit{The RSME of \emph{LSD} was similar to {\tt node.dating} with 1000 steps, however {\tt node.dating} still performed better.
+\emph{LSD} completed very quickly and remains a viable software for time-divergence analysis.
+The advantage of {\tt node.dating} is the ease that it can be intergrated into \emph{R} pipelines.}
 \emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
 In contrast, \emph{BEAST} performed poorly when limited to $10^4$ steps, requiring roughly the same amount of computing time as \code{node.dating} at 100 steps.
-However, results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
+\edit{However, $10^4$ and even $10^6$ steps are extremely small amounts of iterations for a \emph{BEAST} run.
+Furthermore}, results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
 
 \begin{table}[t]
-	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} and comparable software on 50 simulated trees}
+	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} and comparable software on 50 simulated trees\edit{. Runtime is in seconds and RMSE is in simulated days (see Supplementary Infornation)} }
 	\label{tab:runtime}
 	\centering
 	\begin{tabular}{lrr}
 		\hline
-		Software & Runtime (s) & RMSE (days) \\
+		Software & Runtime\edit{ } & RMSE\edit{ } \\
 		\hline
 		\code{node.dating} (initial) & 1.64 & 29.2 \\
 		\code{node.dating} (1 step) & 2.26 & 26.7 \\
@@ -128,18 +140,19 @@ However, results using \emph{BEAST} are not strictly comparable since we used se
 	\end{tabular}
 \end{table}
 
-\vspace*{-15pt}
+\vspace*{-18pt}
 
-\section{Visualization} \label{sec:vis}
+\section{\edit{Intra-patient HIV example}} \label{sec:vis}
 In this section, we provide a visualization of sequence data using the estimated dates of internal nodes.
-We retrieved intra-host patient-derived sequences from Patient 16617 on the LANL HIV database (http://www.hiv.lanl.gov/, accessed June 24, 2015).
+We retrieved \edit{heterochronous} intra-host patient-derived sequences from Patient 16617 on the LANL HIV database (http://www.hiv.lanl.gov/, accessed June 24, 2015).
 This patient's sequence data was collected in \cite{Llewellyn06} as Patient 1180.
 We reconstructed the sequences' phylogenetic tree using the method described in the Supplementary Information.
-We then estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
-Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
-This plot is shown in Figure \ref{fig:pat16617}.
+We \edit{ } estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
+In Figure \ref{fig:pat16617}, we show the genetic distance from the root versus time og the internal nodes and sampled sequences.
+%Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
+%This plot is shown in Figure \ref{fig:pat16617}.
 
-\vspace*{-15pt}
+\vspace*{-18pt}
 
 \section{Future work} \label{sec:discuss}
 One drawback of our methodology is that it assumes that the phylogeny follows a strict molecular clock.
@@ -154,17 +167,19 @@ It may be possible to incorporate this `negative' evolution into the model.
 	\label{fig:pat16617}
 \end{figure}
 
-\vspace*{-15pt}
+\vspace*{-18pt}
 
 \section*{Acknowledgements} \label{sec:ackn}
 We would like to thank Richard Liang for his aid in automating \emph{TempEst}.
 
-\vspace*{-15pt}
+\vspace*{-18pt}
 
 \section*{Funding} \label{sec:fund}
 This work was supported by the Canadian Institutes of Health Research (CIHR Team Grant: HIV Cure Research --- The Canadian HIV Cure Research Enterprise; CanCure), by a CIHR operating grant to AFYP (HOP-111406).
 Research reported in this publication was partially supported by the Bill and Melinda Gates Foundation Award Number OPP1110049.
 AFYP was supported by a CIHR New Investigator Award and by a salary award from the Michael Smith Foundation for Health Research, St.~Paul's Hospital Foundation and the Providence Health Care Research Institute.
+
+\vspace*{-20pt}
 
 \bibliographystyle{bio}
 \begin{thebibliography}{14}
@@ -226,6 +241,10 @@ Sanderson, M.~J. (2003) {r8s}: inferring absolute rates of molecular evolution
 \bibitem[{Shapiro et~al.(2004)}]{Shapiro04}
 Shapiro, B. et~al. (2004) Rise and fall of the {Beringian Steppe} bison.
 \newblock \emph{Science}, 306, 1561--1565.
+
+\bibitem[{Stadler et~al.(2013)}]{Stadler13}
+\edit{Stadler, T. et~al. (2013) Birth-death skyline plot reveals temporal changes of epidemic spread in HIV and hepatitis C virus. (HCV).
+\newblock \emph{PNAS}, 110(1), 228--33.}
 
 \bibitem[{To et~al.(2016)}]{LSD}
 To, T.-H. et~al. (2016) Fast dating using least-squares criteria and

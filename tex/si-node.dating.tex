@@ -19,7 +19,13 @@
 \usepackage{amsmath}
 \usepackage{xcolor}
 
+\usepackage{color}
+
+\usepackage{soul}
+\sethlcolor{red}
+
 \newcommand{\code}[1]{{\tt #1}}
+\newcommand{\edit}[1]{#1}
  
 \begin{document}
 
@@ -39,7 +45,10 @@
 \section{Simulation} \label{sec:sim}
 To verify the accuracy of \code{node.dating}, we applied it to simulated data.
 We simulated 50 phylogenetic trees with 100 tips each using a birth-death model with the \emph{R} package \emph{TreeSim} \citep{TreeSim} using the parameters: $\lambda = 5.116 \times 10^{-2}$ day$^{-1}$, $\delta = 5.006 \times 10^{-2}$ day$^{-1}$, and $s = 5.237 \times 10^{-3}$.
-We then applied a strict molecular clock to the trees with the \emph{R} package \emph{NELSI} \citep{NELSI} using the parameters: $\mu = \ 1.964\times 10^{-4}$ and $\sigma = \ 1.417\times 10^{-5}$ substitutions per generation.
+\edit{Upon death, lineages are sampled with probability $s$ to produce heterochronous data.
+The process runs until 100 tips are sampled from the tree; in our case, this created trees that span an average of 2400 simulated days.}
+
+\edit{Next we} applied a strict molecular clock to the trees with the \emph{R} package \emph{NELSI} \citep{NELSI} using the parameters: $\mu = \ 1.964\times 10^{-4}$ and $\sigma = \ 1.417\times 10^{-5}$ substitutions per generation.
 We used these trees to simulate HIV sequences with \emph{INDELible} 1.03 \citep{Indelible09} using a HKY85 nucleotide substitution model \cite{HKY85} with a stationary distribution of 0.42, 0.15, 0.15, 0.28 for A, C, G, T respectively and a transitional bias of $\kappa = 8.5$.
 Finally we reconstructed phylogenetic trees from the sequences using \emph{RAxML} version 8.2.4 \citep{Raxml14} with the GTR model and rooted the trees using the \code{rtt} function of the \emph{R} package, \emph{ape} \citep{APE}.
 This process is engineered to replicate phylogenetic trees derived from real data.
