@@ -67,7 +67,7 @@ Here we present the \emph{R} program \code{node.dating}, \edit{divergence-time a
 Phylogenetic trees represent the evolutionary relationships among populations or species through their common ancestors.  
 %(Ways to make trees \citep{Raxml14}).
 The length of a branch in the phylogeny usually corresponds to the expected amount of evolution between the ancestor and its descendant, where the passage of time and the rate of evolution are confounded.
-However, when there is external information available on the location of nodes in the tree in time, then the branch lengths can be rescaled with respect to time given sufficient variation in node timings for measurable evolution to occur.
+\edit{W}hen there is external information available on the location of nodes in the tree in time,\edit{ }the branch lengths can be rescaled with respect to time given sufficient variation in node timings for measurable evolution to occur.
 %In the presence of a molecular clock, the edges of a phylogenetic tree can be scaled over time to give a `time tree'.
 %The nodes of a time tree also carry a time value which for the tips of the tree represent the sampling time of the tip's sequence.
 Thus, the internal nodes of a time-scaled tree estimate the dates that the respective lineages diverged from their common ancestor \citep{Kumar16}.
@@ -75,9 +75,9 @@ These date estimates are an important resource for reconstructing the evolutiona
 In molecular epidemiology, these dates can also provide a rough approximation of transmission times during an outbreak of infectious disease 
 \citep{Ypma13}.
 
-A multitude of \edit{divergence-time analysis} software has been developed to reconstruct ancestral dates and create time-scaled trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics \citep{UPGMA, TREBLE}, and least squares \citep{LSD}.
+A multitude of software has been developed to reconstruct ancestral dates and create time-scaled trees using various techniques such as: linear regression \citep{Tempest}, maximum likelihood \citep{TipDates, r8ts, PAML}, Bayesian analysis \citep{BEAST}, heuristics\edit{ }\citep{TREBLE}, and least squares \citep{LSD}.
 However, most of these software are either no longer actively maintained, difficult to obtain, or difficult to integrate into automated workflows.
-Our software, \code{node.dating}, uses a maximum likelihood approach to date the internal nodes of a phylogenetic tree.
+Our software, \code{node.dating}, uses a maximum likelihood approach to \edit{perform divergence-time analysis.}
 \code{node.dating} is written in \emph{R} \edit{v3.30} and is a recent addition to the \emph{R} package \emph{ape} \edit{v3.6} \citep{APE}.
 %; it is also available in the GitHub repository: https://github.com/brj1/node.dating.
 Previously, \emph{ape} had the capability to estimate the dates of internal nodes via the \code{chronos} function; however \code{chronos} requires ultrametric trees and is thus unable to incorporate information from tips that are sampled at different points in time.
@@ -94,11 +94,11 @@ Then using these estimates, the algorithm iterates a specified number of times.
 \vspace*{-18pt}
 
 \section{Runtime and accuracy} \label{sec:tests}
-In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees with 100 tips each \edit{and simulated time span around 2400 days, similar to real within-patient HIV sequences.}
+In order to test the viability of \code{node.dating}, we ran it on 50 simulated trees with 100 tips each \edit{and simulated time span of about 2400 days, similar to real within-patient HIV sequences.}
 %All trees were rooted using the same root-to-tip method prior to date estimation using the different methods.
 %We evaluated the results using a weighted root mean squared error (RMSE).
-We compared these internal node dating results against a modified version of \emph{TempEst} v1.5 and \emph{LSD} 0.2 using \edit{a} weighted root mean squared error (RMSE).
-\emph{TempEst} uses the prediction given by a linear regression to estimate the dates of the internal nodes and \emph{LSD} uses a least squares method.
+We compared these internal node dating results against a modified version of \emph{TempEst} v1.5 and \emph{LSD} v0.2 using \edit{a} weighted root mean squared error (RMSE).
+%\emph{TempEst} uses the prediction given by a linear regression to estimate the dates of the internal nodes and \emph{LSD} uses a least squares method.
 We also compared our results with \emph{BEAST} v2.3.2 \edit{with a birth death skyline serial prior (Stadler et~al., 2013) and a strict clock model} using simulated sequence data as its inputs.
 \edit{The simulation method and weighted RMSE} are detailed in the Supplementary Information.
 
@@ -114,16 +114,17 @@ However, The main purpose of \emph{TempEst} is to detect or verify the presence 
 The advantage of {\tt node.dating} is the ease that it can be intergrated into \emph{R} pipelines.}
 \emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
 In contrast, \emph{BEAST} performed poorly when limited to $10^4$ steps, requiring roughly the same amount of computing time as \code{node.dating} at 100 steps.
-\edit{However, $10^4$ and even $10^6$ steps are extremely small amounts of iterations for a \emph{BEAST} run.
-Furthermore}, results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
+\edit{However, $10^4$ and even $10^6$ steps are extremely small amounts of iterations for a \emph{BEAST} run. Furthermore},
+However, results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
 
+\begin{comment}
 \begin{table}[t]
-	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} and comparable software on 50 simulated trees\edit{. Runtime is in seconds and RMSE is in simulated days (see Supplementary Infornation)} }
+	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} and comparable software on 50 simulated trees\edit{. Runtime is in seconds and RMSE is in simulated days.} }
 	\label{tab:runtime}
 	\centering
 	\begin{tabular}{lrr}
 		\hline
-		Software & Runtime\edit{ } & RMSE\edit{ } \\
+		Steps & Runtime\edit{ } & RMSE\edit{ } \\
 		\hline
 		\code{node.dating} (initial) & 1.64 & 29.2 \\
 		\code{node.dating} (1 step) & 2.26 & 26.7 \\
@@ -133,11 +134,32 @@ Furthermore}, results using \emph{BEAST} are not strictly comparable since we us
 		\code{node.dating} ($10^4$ steps) & 5950 & 22.1 \\
 		\emph{TempEst} & 11.2 & 132.0 \\
 		\emph{LSD} & 0.707 & 24.9 \\
-		\emph{BEAST} ($10^4$ steps) & 181 & 419. \\
-		\emph{BEAST} ($10^6$ steps) & 6840 & 20.1 \\
+%		\emph{BEAST} ($10^4$ steps) & 181 & 419. \\
+		\emph{BEAST} & 6840 & 20.1 \\
 %		\emph{Minimum} & & 2.02 \\
 		\hline
 	\end{tabular}
+	\vspace{-10pt}
+\end{table}
+\end{comment}
+
+\begin{table}[t]
+	\caption[Runtime and accuracy]{The runtime and accuracy of \code{node.dating} (left) and comparable software (right) on 50 simulated trees\edit{. Runtime is in seconds and RMSE is in simulated days (see Supplementary Information).} }
+	\label{tab:runtime}
+	\centering
+	\begin{tabular}{lrr|lrr}
+		\hline
+		\edit{Steps} & \edit{Runtime} & \edit{RMSE} & Software & Runtime\edit{ } & RMSE\edit{ } \\
+		\hline
+		\edit{initial} & 1.64 & 29.2 & \emph{TempEst} & 11.2 & 132.0 \\
+		\edit{1} & 2.26 & 26.7 & \emph{LSD} & 0.707 & 24.9 \\
+		\edit{10} & 7.62 & 23.7 & \emph{BEAST} ($10^4$ steps) & 181 & 419. \\
+		\edit{100} & 62.1 & 22.8 & \emph{BEAST} ($10^6$ steps) & 6840 & 20.1 \\
+		\edit{1000} & 596.0 & 22.6 & & & \\
+		\edit{$10^4$} & 5950 & 22.1 & & & \\
+		\hline
+	\end{tabular}
+	\vspace{-5pt}
 \end{table}
 
 \vspace*{-18pt}
@@ -147,8 +169,8 @@ In this section, we provide a visualization of sequence data using the estimated
 We retrieved \edit{heterochronous} intra-host patient-derived sequences from Patient 16617 on the LANL HIV database (http://www.hiv.lanl.gov/, accessed June 24, 2015).
 This patient's sequence data was collected in \cite{Llewellyn06} as Patient 1180.
 We reconstructed the sequences' phylogenetic tree using the method described in the Supplementary Information.
-We \edit{ } estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
-In Figure \ref{fig:pat16617}, we show the genetic distance from the root versus time og the internal nodes and sampled sequences.
+We\edit{ }estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
+\edit{In Figure 1 we show} the genetic distance from the root versus time of the internal nodes and sampled sequences.
 %Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
 %This plot is shown in Figure \ref{fig:pat16617}.
 
@@ -161,6 +183,7 @@ The molecular clock assumption implies that mutations are strictly additive over
 It may be possible to incorporate this `negative' evolution into the model.
 
 \begin{figure}[b]
+	\vspace{-10pt}
 	\centering
 	\includegraphics[width=\columnwidth]{patient_16617}
 	\caption[Genetic distance versus time plot]{Genetic distance from the root versus time of the sequences from Patient 16617 from the LANL HIV database. The dates of the internal nodes were estimated using \code{node.dating} and are included in the plot. The edges between adjacent nodes of the tree are drawn as solid lines and the molecular clock is drawn by a dashed line.}
@@ -191,11 +214,11 @@ AFYP was supported by a CIHR New Investigator Award and by a salary award from t
   \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
   \urlstyle{rm}\Url}\fi
 
-\bibitem[{Drummond and Rodrigo(2000)}]{UPGMA}
-Drummond, A. and Rodrigo, R., A~G (2000) Reconstructing genealogies of serial
-  samples under the assumption of a molecular clock using serial-sample
-  {UPGMA}.
-\newblock \emph{Molecular Biology and Evolution}, 17(12), 1807--1815.
+%\bibitem[{Drummond and Rodrigo(2000)}]{UPGMA}
+%Drummond, A. and Rodrigo, R., A~G (2000) Reconstructing genealogies of serial
+%  samples under the assumption of a molecular clock using serial-sample
+%  {UPGMA}.
+%\newblock \emph{Molecular Biology and Evolution}, 17(12), 1807--1815.
 
 \bibitem[{Drummond and Rambaut(2007)}]{BEAST}
 Drummond, A.~J. and Rambaut, A. (2007) {BEAST}: {Bayesian} evolutionary
