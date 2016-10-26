@@ -99,11 +99,11 @@ In order to test the viability of \code{node.dating}, we ran it on 50 simulated 
 %We evaluated the results using a weighted root mean squared error (RMSE).
 We compared these internal node dating results against a modified version of \emph{TempEst} v1.5 and \emph{LSD} v0.2 using \edit{a} weighted root mean squared error (RMSE).
 %\emph{TempEst} uses the prediction given by a linear regression to estimate the dates of the internal nodes and \emph{LSD} uses a least squares method.
-We also compared our results with \emph{BEAST} v2.3.2 \edit{with a birth death skyline serial prior (Stadler et~al., 2013) and a strict clock model} using simulated sequence data as its inputs.
+We also compared our results with \emph{BEAST} v2.3.2 \edit{using a birth death skyline serial prior (Stadler et~al., 2013) and a strict clock model with} simulated sequence data as its inputs.
 \edit{The simulation method and weighted RMSE} are detailed in the Supplementary Information.
 
 \edit{The RMSE of {\tt node.dating} converged within 1 unit of its optimum RMSE of $22.1$ within 100 steps.
-This quick convergence appears to be independant of data size as can be seen in supplementary trials found on the GitHub repository, https://github.com/brj1/node.dating.}
+This quick convergence appears to be independent of data size as can be seen in supplementary trials found on the GitHub repository, https://github.com/brj1/node.dating.}
 %The average weighted RMSE of the MRCA using \emph{TempEst} was $132.$ days and using \emph{LSD} was $24.9$ days.
 The\edit{ }RMSE\edit{} of \emph{TempEst} \edit{was} higher than that obtained by \code{node.dating} with \edit{any number of} steps\edit{.}
 %Overall, the RMSE of each tree using \code{node.dating} with 1000 iterations was less than the RMSE using \emph{TempEst}, suggesting that \code{node.dating} is more accurate at dating the internal nodes of phylogenetic trees.
@@ -111,11 +111,10 @@ However, The main purpose of \emph{TempEst} is to detect or verify the presence 
 %We did not use \emph{TempEst} or \emph{LSD}'s root-to-tip regression in our experiments because we merely wanted to compare the internal node dating.
 \edit{The RSME of \emph{LSD} was similar to {\tt node.dating} with 1000 steps, however {\tt node.dating} still performed better.
 \emph{LSD} completed very quickly and remains a viable software for time-divergence analysis.
-The advantage of {\tt node.dating} is the ease that it can be intergrated into \emph{R} pipelines.}
+The advantage of {\tt node.dating} is the ease that it can be integrated into \emph{R} pipelines.}
 \emph{BEAST} performed the best of all methods when running $10^6$ steps, but this also took the most time.
 In contrast, \emph{BEAST} performed poorly when limited to $10^4$ steps, requiring roughly the same amount of computing time as \code{node.dating} at 100 steps.
-\edit{However, $10^4$ and even $10^6$ steps are extremely small amounts of iterations for a \emph{BEAST} run. Furthermore},
-However, results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
+\edit{However, $10^4$ and even $10^6$ steps are extremely small amounts of iterations for a \emph{BEAST} run. Furthermore,} results using \emph{BEAST} are not strictly comparable since we used sequence data as inputs instead of the phylogenetic trees.
 
 \begin{comment}
 \begin{table}[t]
@@ -170,7 +169,7 @@ We retrieved \edit{heterochronous} intra-host patient-derived sequences from Pat
 This patient's sequence data was collected in \cite{Llewellyn06} as Patient 1180.
 We reconstructed the sequences' phylogenetic tree using the method described in the Supplementary Information.
 We\edit{ }estimated the dates of the internal nodes using \code{node.dating} with 1000 iterations. 
-\edit{In Figure 1 we show} the genetic distance from the root versus time of the internal nodes and sampled sequences.
+\edit{In Figure 1, we show} the genetic distance from the root versus time of the internal nodes and sampled sequences.
 %Finally we plotted the genetic distance from the root versus time of the internal nodes and the sampled sequences. 
 %This plot is shown in Figure \ref{fig:pat16617}.
 
