@@ -1,6 +1,8 @@
+*.doc*
 *.log
 *.gz
 *.aux
 *.bbl
 *.blg
 .DS_STORE
+tex/*.pdf
