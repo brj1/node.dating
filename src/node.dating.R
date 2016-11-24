@@ -50,12 +50,21 @@ library(ape)
 # returns a list containing the tree, the date of the root, the mutation rate,
 # the log likelihood of the linear regression and the log likelihood of the
 # null model (mu=0)
-estimate.mu <- function(t, node.dates) {
+estimate.mu <- function(t, node.dates, output.type='numeric') {
+	# check parameters
+	if (!(output.type %in% c('numeric', 'list', 'glm')))
+		stop(paste("unknown output type: ", output.type, sep=""))
+
 	# fit linear model
 	g <- glm(node.depth.edgelength(t)[1:length(node.dates)] ~ node.dates, na.action=na.omit)
 	null.g <- glm(node.depth.edgelength(t)[1:length(node.dates)] ~ 1, na.action=na.omit)
 	
-	list(tree=t, root.date=coef(g)[[1]], mu=ceof(g)[[2]], logLik=logLik(g), null.logLik(null.g))
+	if (output.type == 'numeric')
+		coef(g)[[2]]
+	else if (output.type == 'list')
+		list(tree=t, root.date=coef(g)[[1]], mu=coef(g)[[2]], logLik=logLik(g), null.logLik(null.g))
+	else if (output.type == 'glm')
+		g
 }
 
 # Estimate the dates of the internal nodes of a phylogenetic tree.
@@ -93,13 +102,17 @@ estimate.mu <- function(t, node.dates) {
 #
 # returns a list containing the tree, a vector of the estimated dates of the 
 # tips and internal nodes, the mutation rate and the log likelihood of the tree
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t)) {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t), output.type = 'vector') {
+	
+	# check parameters
 	if (any(mu < 0))
 		stop(paste("mu (", mu, ") less than 0", sep=""))
 		
+	if (!(output.type %in% c('vector', 'list', 'phylo4d')))
+		stop(paste("unknown output type: ", output.type, sep=""))
+		
+	# init vars	
 	mu <- if (length(mu) == 1) rep(mu, length(t$edge.length)) else mu
-
-	# init vars
 	n.tips <- length(t$tip.label)
 	dates <- if (length(node.dates) == n.tips) {
 			c(node.dates, rep(NA, t$Nnode))
@@ -235,8 +248,9 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, mi
 		for (n in nodes) {		
 			dates[n + n.tips] <- estimate(n)
 		}
-				
-		new.lik <- sum(calc.Like(dates[t$edge[,2]], 1:length(t$edge.length), dates[t$edge[,1]])) + scale.lik
+		
+		all.lik <- 	calc.Like(dates[t$edge[,2]], 1:length(t$edge.length), dates[t$edge[,1]]) + scale.lik
+		new.lik <- sum(all.lik)
 		
 		if (show.steps > 0 && ((iter.step %% show.steps) == 0)) {
 			cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
@@ -262,7 +276,27 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates)$mu, mi
 		cat(paste("Step: ", iter.step, ", Likelihood: ", new.lik, "\n", sep=""))
 	}
 	
-	list(tree=t, node.date=dates, mu=mu, logLik=new.lik)
+	if (output.type == 'vector')
+		dates
+	else if (output.type == 'list') {
+		time.t <- t
+		time.t$edge.length <- dates[t$edge[, 2]] - dates[t$edge[, 1]]
+	
+		list(tree=t, time.tree=time.t, node.date=dates, mu=mu, log.lik=new.lik, edge.lik=all.lik)
+	}
+	else if (output.type == 'phylo4d') {
+		from.edge <- unlist(lapply(1:(n.tips + t$Nnode), function(x) {
+			if (any(t$edge[,2] == x)) which(t$edge[,2] == x) else NA
+		}))
+		parent <- t$edge[from.edge, 1]
+		
+		df <- data.frame(date=dates,
+			ancestor.date=dates[parent],
+			edge.time=dates-dates[parent],
+			edge.lik=all.lik[from.edge]
+		)
+						
+		if (output.type == 'phylo4d')
+			phylo4d(t, all.data=df, metadata=list(mu=mu, log.lik=new.lik))
+	}
 }
-
-
