@@ -102,7 +102,7 @@ estimate.mu <- function(t, node.dates, output.type='numeric') {
 #
 # returns a list containing the tree, a vector of the estimated dates of the 
 # tips and internal nodes, the mutation rate and the log likelihood of the tree
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t), output.type = 'vector') {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.tree(t), output.type = 'vector') {
 	
 	# check parameters
 	if (any(mu < 0))
@@ -156,34 +156,93 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 	
 	opt.fun <- function(x, ch, p, ch.edge, p.edge, use.parent=T) {
 		sum(if (!use.parent || length(dates[p]) == 0 || is.na(dates[p])) {		
-				calc.Like(dates[ch], ch.edge.length, x)
+				calc.Like(dates[ch], t$edge.length[ch.edge], x)
 			} else {
-				calc.Like(c(dates[ch], x), c(ch.edge.length, p.edge.length), c(rep(x, length(dates[ch])), dates[p]))
+				calc.Like(c(dates[ch], x), c(t$edge.length[ch.edge], t$edge.length[p.edge]), c(rep(x, length(dates[ch])), dates[p]))
 			})
+	}
+	
+	solve.lin <- function(bounds, ch.times, ch.edge) {	
+		y <- (mu[ch.edge] * ch.times - t$edge.length[ch.edge]) / mu[ch.edge]
+		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		if (bounds[1] < y && y < bounds[2])
+			x <- c(x, y)
+				
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge, y)))))]
+	}
+	
+	solve.poly2 <- function(bounds, a, b, c.0) {
+		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+	
+		if (b ^ 2 - 4 * a * c.0 >= 0) {
+			if (a == 0) {
+				y <- -c.0 / b
+				
+				if (bounds[1] < y && y < bounds[2])
+					x <- c(x, y)
+			} else {
+				x.1 <- (-b + sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
+				x.2 <- (-b - sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
+					
+				if (bounds[1] < x.1 && x.1 < bounds[2])
+					x <- c(x, x.1)
+				if (bounds[1] < x.2 && x.2 < bounds[2])
+					x <- c(x, x.2)
+			}
+		}
+		
+		x
 	}
 	
 	solve.bin <- function(bounds, ch.times, ch.edge) {
 		ch.edge.length <- t$edge.length[ch.edge]
-		
 		a <- sum(mu[ch.edge])
 		b <- ch.edge.length[1] + ch.edge.length[2] - a * (ch.times[1] + ch.times[2])
 		c.0 <- a*ch.times[1] * ch.times[2] - ch.times[1] * ch.edge.length[2] - ch.times[2] * ch.edge.length[1]
 						
-		if (b ^ 2 - 4 * a * c.0 < 0) {		
-			return(bounds[1 + (sum(calc.Like(ch.times, ch.edge, bounds[2] - opt.tol)) > sum(calc.Like(ch.times, ch.edge, bounds[1] + opt.tol)))])
-		}
-		else {
-			x.1 <- (-b + sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
-			x.2 <- (-b - sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
+		x <- solve.poly2(bounds, a, b, c.0)					
 			
-			x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
-			if (bounds[1] < x.1 && x.1 < bounds[2])
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge, y)))))]
+	}
+	
+	
+	solve.bin2 <- function(bounds, ch.times, ch.edge, par.time, par.edge) {
+		ch.edge.length <- t$edge.length[ch.edge]
+		par.edge.length <- t$edge.length[par.edge]
+		a <- mu[ch.edge] - mu[par.edge]
+		b <- ch.edge.length + par.edge.length - a * (ch.times + par.time)
+		c.0 <- a*ch.times * par.time - ch.times * par.edge.length - par.time * ch.edge.length
+		
+		cat(sprintf("a: %f, b: %f, c: %f\n", a, b, c.0))
+		
+		x <- solve.poly2(bounds, a, b, c.0)					
+			
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge, par.edge), c(y, par.time))))))]
+	}
+	
+	solve.poly3 <- function(bounds, a, b, c.0, d) {
+		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+	
+		if (a == 0)
+			x <- c(x, solve.poly2(bounds, b, c.0, d))
+		else {
+			delta.0 <- complex(real=b^2 - 3 * a * c.0)
+			delta.1 <- complex(real=2 * b^3 - 9 * a * b * c.0 + 27 * a^2 * d)
+			C <- ((delta.1 + sqrt(delta.1^2 - 4 * delta.0^3)) / 2)^(1/3)
+		
+			x.1 <- Re(-1 / (3 * a) * (b + complex(real=1) * C + delta.0 / (complex(real=1) * C)))
+			x.2 <- Re(-1 / (3 * a) * (b + complex(real=-1/2, imaginary=sqrt(3)/2) * C + delta.0 / (complex(real=-1/2, imaginary=sqrt(3)/2) * C)))
+			x.3 <- Re(-1 / (3 * a) * (b + complex(real=-1/2, imaginary=-sqrt(3)/2) * C + delta.0 / (complex(real=-1/2, imaginary=-sqrt(3)/2) * C)))
+		
+			if (x.1 && bounds[1] < x.1 && x.1 < bounds[2])
 				x <- c(x, x.1)
 			if (bounds[1] < x.2 && x.2 < bounds[2])
 				x <- c(x, x.2)
-		 			 	
-			return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge, y)))))])
+			if (bounds[1] < x.3 && x.3 < bounds[2])
+				x <- c(x, x.3)
 		}
+		
+		x
 	}
 	
 	solve.cube <- function(bounds, ch.times, ch.edge, par.time, par.edge) {
@@ -194,24 +253,10 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		b <- sum(ch.edge.length) + par.edge.length - a * (sum(ch.times) + par.time)
 		c.0 <- a * (ch.times[1] * ch.times[2] + ch.times[1] * par.time + ch.times[2] * par.time) - (ch.times[1] + ch.times[2]) * par.edge.length - (ch.times[1] + par.time) * ch.edge.length[2] - (ch.times[2] + par.time) * ch.edge.length[1]
 		d <- ch.edge.length[1] * ch.times[2] * par.time + ch.edge.length[2] * ch.times[1] * par.time + par.edge.length * ch.times[1] * ch.times[2] - a * prod(ch.times) * par.time
-				
-		delta.0 <- complex(real=b^2 - 3 * a * c.0)
-		delta.1 <- complex(real=2 * b^3 - 9 * a * b * c.0 + 27 * a^2 * d)
-		C <- ((delta.1 + sqrt(delta.1^2 - 4 * delta.0^3)) / 2)^(1/3)
 		
-		x.1 <- Re(-1 / (3 * a) * (b + complex(real=1) * C + delta.0 / (complex(real=1) * C)))
-		x.2 <- Re(-1 / (3 * a) * (b + complex(real=-1/2, imaginary=sqrt(3)/2) * C + delta.0 / (complex(real=-1/2, imaginary=sqrt(3)/2) * C)))
-		x.3 <- Re(-1 / (3 * a) * (b + complex(real=-1/2, imaginary=-sqrt(3)/2) * C + delta.0 / (complex(real=-1/2, imaginary=-sqrt(3)/2) * C)))
+		x <- solve.poly3(bounds, a, b, c.0, d)
 		
-		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
-		if (x.1 && bounds[1] < x.1 && x.1 < bounds[2])
-			x <- c(x, x.1)
-		if (bounds[1] < x.2 && x.2 < bounds[2])
-			x <- c(x, x.2)
-		if (bounds[1] < x.3 && x.3 < bounds[2])
-			x <- c(x, x.3)
-		
-		return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge, par.edge), c(y, y, par.time))))))])
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge, par.edge), c(y, y, par.time))))))]
 	}
 	
 	estimate <- function(node) {
@@ -228,12 +273,18 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 			}
 			
 		if (is.binary) {
-			if (length(dates[p]) == 0 || is.na(dates[p]))
-				solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge)
-			else 
-				solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge, dates[p], p.edge)
-		}
-		else {				
+			if (length(dates[p]) == 0 || is.na(dates[p])) {
+				if (length(ch.edge) == 2)
+					solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge)
+				else
+					solve.lin(c(m, min(dates[ch])), dates[ch], ch.edge)
+			} else {
+				if (length(ch.edge) == 2)
+					solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge, dates[p], p.edge)
+				else
+					solve.bin2(c(m, min(dates[ch])), dates[ch], ch.edge, dates[p], p.edge)
+			}
+		} else {				
 			res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge, p.edge, maximum=T)
 		
 			res$maximum
@@ -283,8 +334,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		time.t$edge.length <- dates[t$edge[, 2]] - dates[t$edge[, 1]]
 	
 		list(tree=t, time.tree=time.t, node.date=dates, mu=mu, log.lik=new.lik, edge.lik=all.lik)
-	}
-	else if (output.type == 'phylo4d') {
+	} else if (output.type == 'phylo4d') {
 		from.edge <- unlist(lapply(1:(n.tips + t$Nnode), function(x) {
 			if (any(t$edge[,2] == x)) which(t$edge[,2] == x) else NA
 		}))
