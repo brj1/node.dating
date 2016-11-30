@@ -151,6 +151,15 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 			})
 	}
 	
+	solve.lin <- function(bounds, ch.times, ch.edge.length) {	
+		y <- (mu * ch.times - ch.edge.length) / mu
+		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		if (bounds[1] < y && y < bounds[2])
+			x <- c(x, y)
+				
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge.length, y)))))]
+	}
+	
 	solve.bin <- function(bounds, ch.times, ch.edge.length) {
 		a <- 2 * mu
 		b <- ch.edge.length[1] + ch.edge.length[2] - 2 * mu * (ch.times[1] + ch.times[2])
@@ -159,7 +168,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		b ^ 2 - 4 * a * c.0 < 0
 		
 		if (b ^ 2 - 4 * a * c.0 < 0) {		
-			return(bounds[1 + (sum(calc.Like(ch.times, ch.edge.length, bounds[2] - opt.tol)) > sum(calc.Like(ch.times, ch.edge.length, bounds[1] + opt.tol)))])
+			bounds[1 + (sum(calc.Like(ch.times, ch.edge.length, bounds[2] - opt.tol)) > sum(calc.Like(ch.times, ch.edge.length, bounds[1] + opt.tol)))]
 		}
 		else {
 			x.1 <- (-b + sqrt(b ^ 2 - 4 * a * c.0)) / (2 * a)
@@ -171,8 +180,18 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 			if (bounds[1] < x.2 && x.2 < bounds[2])
 				x <- c(x, x.2)
 		 	
-			return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge.length, y)))))])
+			x[which.max(unlist(lapply(x, function(y) sum(calc.Like(ch.times, ch.edge.length, y)))))]
 		}
+	}
+	
+	solve.bin2 <- function(bounds, ch.times, ch.edge.length, par.time, par.edge.length) {
+		best <- (ch.edge.length * par.time + par.edge.length * ch.times) / (ch.edge.length + par.edge.length)
+		
+		x = c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		if (bounds[1] < best && best < bounds[2])
+			x <- c(x, best)
+			
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge.length, par.edge.length), c(y, par.time))))))]
 	}
 	
 	solve.cube <- function(bounds, ch.times, ch.edge.length, par.time, par.edge.length) {
@@ -197,7 +216,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 		if (bounds[1] < x.3 && x.3 < bounds[2])
 			x <- c(x, x.3)
 		
-		return(x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge.length, par.edge.length), c(y, y, par.time))))))])
+		x[which.max(unlist(lapply(x, function(y) sum(calc.Like(c(ch.times, y), c(ch.edge.length, par.edge.length), c(y, y, par.time))))))]
 	}
 	
 	estimate <- function(node) {
@@ -214,10 +233,18 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 			}
 			
 		if (is.binary) {
-			if (length(dates[p]) == 0 || is.na(dates[p]))
-				solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge.length)
-			else 
-				solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge.length, dates[p], p.edge.length)
+			if (length(dates[p]) == 0 || is.na(dates[p])) {
+				if (length(ch.edge.length) == 2)
+					solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge.length)
+				else
+					solve.lin(c(m, min(dates[ch])), dates[ch], ch.edge.length)
+			}
+			else {
+				if (length(ch.edge.length) == 2)
+					solve.cube(c(m, min(dates[ch])), dates[ch], ch.edge.length, dates[p], p.edge.length)
+				else
+					solve.bin2(c(m, min(dates[ch])), dates[ch], ch.edge.length, dates[p], p.edge.length)
+			}
 		}
 		else {		
 			res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge.length, p.edge.length, maximum=T)
