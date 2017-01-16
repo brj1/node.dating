@@ -1,6 +1,7 @@
 ## node.dating.R (2016-06-21)
 ## This file is part of the R-package `ape'.
 ## See the file COPYING in the package ape available at cran.r-project.org for licensing issues.
+library(ape)
 
 # Copyright (c) 2016, Bradley R. Jones, BC Centre for Excellence in HIV/AIDS
 # All rights reserved.
@@ -35,8 +36,6 @@
 # Rambaut, Andrew. "Estimating the rate of molecular evolution: incorporating 
 # non-contemporaneous sequences into maximum likelihood phylogenies." 
 # Bioinformatics 16.4 (2000): 395-399.
-
-library(ape)
 
 # Estimate the mutation rate of a phylogenetic tree from the tip dates using 
 # linear regression. This model assumes that the tree follows a molecular 
@@ -97,7 +96,7 @@ estimate.mu <- function(t, node.dates, p.tol=0.05) {
 # step.
 #
 # returns a vector of the estimated dates of the tips and internal nodes
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.tree(t)) {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.phylo(t)) {
 	
 	# check parameters
 	if (any(mu < 0))
