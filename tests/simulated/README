@@ -1,0 +1,21 @@
+This folder contains tests for the simulated data.
+
+The two sh files should NOT be run, instead the data genetated in simulated.tar.gz should be used.
+
+Before running tests the tarball siumulated.tar.gz should be unzipped with "tar xf simulated.tar.gz"
+
+tester.generate.simulated.trees.R generates the simulated trees (this should NOT be run).
+
+tester.get.dates.R extracts the dates from the tests results of comparale software (this should NOT be run).
+
+tester.run.node.dating.R runs node.dating on the tests data with a given numer of steps (timing the run)
+"Rscript tester.run.node.dating.R N" will run node.dating for N steps plus the initialization step.
+
+tester.get.rmse.R computes the rmse from the dates estimated by the tests. See the Supplementary Methods for details on how this RMSE is calculated.
+"Rscript tester.get.rmse.R TEST" will compute the RMSE for the test, TEST.
+
+simulated.tar.gz contains all of the test data for the following tests:
+node.dating (Inital Step)
+lsd
+TempEst
+BEAST (10^4 steps)
