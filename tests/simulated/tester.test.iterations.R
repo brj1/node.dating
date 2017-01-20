@@ -6,7 +6,7 @@ n.trees = 50
 
 cat("reading trees\n")
 
-trees <- c(lapply(grep("HIV_[123456789]_rooted.tre", dir("."), value=T, perl=T), read.tree), lapply(grep("HIV_[123456789][1234567890]_rooted.tre", dir("."), value=T, perl=T), read.tree))
+trees <- c(lapply(grep("HIV_[123456789]_rooted.tre", dir(paste0("HIV_", i)), value=T, perl=T), read.tree), lapply(grep("HIV_[123456789][1234567890]_rooted.tre", dir(paste0("HIV_", i)), value=T, perl=T), read.tree))
 
 trees <- lapply(trees, function(t) {t$tip.date <- extract_dates(t$tip.label); t})
 trees <- lapply(trees, function(t) {t$mu <- estimate.mu(t, t$tip.date); t})
@@ -15,8 +15,8 @@ trees <- lapply(trees, function(t) {t$occ <- table(unlist(t$mrcas)); t})
 
 cat("reading true data\n")
 
-mrcas <- lapply(1:n.trees, function(n) read.csv(paste0("HIV_", n, "_mrca.csv"), header=T)[,2:101])
-dates <- lapply(1:n.trees, function(n) read.csv(paste0("HIV_", n, "_dates.csv"), header=T)[,2:101])
+mrcas <- lapply(1:n.trees, function(n) read.csv(paste0("HIV_", i, "/HIV_", n, "_mrca.csv"), header=T)[,2:101])
+dates <- lapply(1:n.trees, function(n) read.csv(paste0("HIV_", i, "/HIV_", n, "_dates.csv"), header=T)[,2:101])
 
 o <- lapply(1:n.trees, function(n) order(names(mrcas[[n]])))
 mrcas <- lapply(1:n.trees, function(n) mrcas[[n]][o[[n]], o[[n]]])

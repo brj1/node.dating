@@ -89,11 +89,11 @@ for (i in 1:n.trees) {
 	m <- mrca(trees[[i]])
 	dates <- node.depth.edgelength(trees[[i]])
 		
-	write.csv(m, file=paste0("HIV_", i, "_mrca.csv"))
+	write.csv(m, file=paste0("HIV_", i, "/HIV_", i, "_mrca.csv"))
 		
 	m <- apply(m, c(1, 2), function(n) dates[n])
 		
-	write.csv(m, file=paste0("HIV_", i, "_dates.csv"))
+	write.csv(m, file=paste0("HIV_", i, "/HIV_", i, "_dates.csv"))
 }
 
 sim.trees <- lapply(trees, simulate.clock, params=list(rate=clock.rate, noise=noise.rate))
@@ -137,9 +137,9 @@ system("python fix_control.py control.unfixed.txt control.txt")
 system("indelible")
 
 trees <- lapply(seq(1, n.trees), function(i) {
-		dna <- read.FASTA(paste0("HIV_", i, "_TRUE.fas"))
+		dna <- read.FASTA(paste0("HIV_", i, "/HIV_", i, "_TRUE.fas"))
 		tree <- raxml(dna)
-		write.tree(tree, file=paste0("HIV_", i , "_unrooted.tre"))
+		write.tree(tree, file=paste0("HIV_", i, "/HIV_", i , "_unrooted.tre"))
 		tree
 	})
 
@@ -149,4 +149,4 @@ trees <- lapply(seq(1, n.trees), function(i) {
 
 trees <- lapply(trees, function(t) {t$tip.date <- extract_dates(t$tip.label); t})
 trees <- lapply(trees, function(t) {rtt(t, t$tip.date, opt.tol=1e-8)})
-lapply(seq(1, n.trees), function(i) write.tree(trees[[i]], file=paste0("HIV_", i , "_rooted.tre")))
+lapply(seq(1, n.trees), function(i) write.tree(trees[[i]], file=paste0("HIV_", i, "/HIV_", i , "_rooted.tre")))
