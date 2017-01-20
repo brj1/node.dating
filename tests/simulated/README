@@ -6,16 +6,26 @@ Before running tests the tarball siumulated.tar.gz should be unzipped with "tar 
 
 tester.generate.simulated.trees.R generates the simulated trees (this should NOT be run).
 
-tester.get.dates.R extracts the dates from the tests results of comparale software (this should NOT be run).
+tester.get.dates.R extracts the dates from the tests results of comparale software (this does not need to be run).
 
 tester.run.node.dating.R runs node.dating on the tests data with a given numer of steps (timing the run)
 "Rscript tester.run.node.dating.R N" will run node.dating for N steps plus the initialization step.
 
+tester.get.min.rmse.R computes the dates that will gives the best weighted RMSE for the rebuilt trees (does not need to be run; not in manuscript).
+
 tester.get.rmse.R computes the rmse from the dates estimated by the tests. See the Supplementary Methods for details on how this RMSE is calculated.
 "Rscript tester.get.rmse.R TEST" will compute the RMSE for the test, TEST.
 
+tester.test.iteration.R genereates a plot that compares the the RMSEs of the trees with differnt numbers of iterations (1-100) (not in manuscript).
+
 simulated.tar.gz contains all of the test data for the following tests:
 node.dating (Inital Step)
+node.dating (1 step)
+node.dating (10 steps)
+node.dating (100 steps)
+node.dating (1000 steps)
+node.dating (10^4 steps)
 lsd
 TempEst
 BEAST (10^4 steps)
+best RMSE
