@@ -12,7 +12,7 @@
     if (nsteps <= 0) opt.tol else 0, is.binary = is.binary.tree(t))
 }
 \arguments{
-  \item{t}{an object of class '"phylo"'}
+  \item{t}{an object of class "phylo"}
   \item{node.dates}{a numeric vector of dates for the tips, in the same order as
     't$tip.label' or a vector of dates for all of the nodes.}
   \item{p}{p-value cutoff for failed regression.}
@@ -50,9 +50,9 @@
   priors in the inital step.  If all of the dates for nodes are given, then
   'estimate.dates' will not run the inital step.
 
-  If 'is.binary' is set to FALSE, 'estimate.dates' uses the '"optimize"' function as
-  the optimization method.  By default, R's '"optimize"' function uses a precision
-  of '".Machine$double.eps^0.25"', which is about 0.0001 on a 64-bit system.  This
+  If 'is.binary' is set to FALSE, 'estimate.dates' uses the "optimize" function as
+  the optimization method.  By default, R's "optimize" function uses a precision
+  of ".Machine$double.eps^0.25", which is about 0.0001 on a 64-bit system.  This
   should be set to a smaller value if the branch lengths of 't' are very short.  If
   'is.binary' is set to TRUE, estimate dates uses calculus to deterimine the maximum
   likelihood at each step, which is faster. The bounds of permissible values are 
@@ -81,8 +81,8 @@
   phylogenies. \emph{Bioinformatics}, \bold{16}, 395--399.
 
   Jones, Bradley R., and Poon, Art F. Y. (2016)
-  "node.dating: dating ancestors in phylogenetic trees in R"
-  (2016). preprint.
+  node.dating: dating ancestors in phylogenetic trees in R
+  \emph{Bioinformatics}, \bold{33}, 932--934.
 }
 \seealso{
   \code{\link{optimize}, \link{rtt}}
