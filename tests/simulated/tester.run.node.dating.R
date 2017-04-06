@@ -29,5 +29,3 @@ for (i in 1:n.trees) {
 	
 	write.csv(m, file=paste0("HIV_", i, "/HIV_", i, "_dates_node.dating.", nsteps, ".csv"))
 }
-
-Sys.time() - st
