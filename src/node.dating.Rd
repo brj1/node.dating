@@ -1,7 +1,6 @@
 \name{node.dating}
 \alias{estimate.mu}
 \alias{estimate.dates}
-\alias{node.dating}
 \title{node.dating}
 \description{
   Estimate the dates of a rooted phylogenetic tree from the tip dates.
@@ -18,7 +17,7 @@
     't$tip.label' or a vector of dates for all of the nodes.}
   \item{p}{p-value cutoff for failed regression.}
   \item{mu}{mutation rate.}
-  \item{min.date}{the minimum bound on the dates of nodes.}
+  \item{min.date}{the minium bound on the dates of nodes}
   \item{show.steps}{print the log likelihood every show.steps.  If 0 will supress
     output.}
   \item{opt.tol}{tolerance for optimization precision.}
