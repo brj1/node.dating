@@ -102,7 +102,7 @@ estimate.mu <- function(t, node.dates, output.type='numeric') {
 #
 # returns a list containing the tree, a vector of the estimated dates of the 
 # tips and internal nodes, the mutation rate and the log likelihood of the tree
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.tree(t), output.type = 'vector') {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.phylo(t), output.type = 'vector') {
 	
 	# check parameters
 	if (any(mu < 0))
