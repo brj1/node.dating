@@ -23,7 +23,7 @@
 		\code{node.dating} uses a tip to root maximum likelihood approach, based on \cite{Felsenstein81, TipDates}, to estimate the dates of the internal nodes of a phylogenetic tree given a rooted phylogenetic tree with branch length in number of molecular substitutions per base and dated tips.
 		
 		The mutation rate, $\mu$ of the tree is estimated by estimating the parameter $\mu$ in the linear model:
-		\[\mathbf{D}_n = \frac{1}{\mu}\mathbf{t}_n + a,\]
+		\[\mathbf{D}_n = \mu\mathbf{t}_n + a,\]
 		where $\mathbf{t}_n$ is the date of the tip, $n$, of the phylogenetic tree, $\mathbf{D}_n$ is the distance of $n$ from the root, in expected number of substitutions per base, and $a$ and $\mu$ are estimated parameters.
 		The mutation rate can optionally be provided.
 		
