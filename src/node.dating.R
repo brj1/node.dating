@@ -62,7 +62,7 @@ estimate.mu <- function(t, node.dates, output.type='numeric') {
 	if (output.type == 'numeric')
 		coef(g)[[2]]
 	else if (output.type == 'list')
-		list(tree=t, root.date=coef(g)[[1]], mu=coef(g)[[2]], logLik=logLik(g), null.logLik(null.g))
+		list(tree=t, root.date=-coef(g)[[1]]/coef(g)[[2]], mu=coef(g)[[2]], logLik=logLik(g), null.logLik=logLik(null.g))
 	else if (output.type == 'glm')
 		g
 }
@@ -102,7 +102,7 @@ estimate.mu <- function(t, node.dates, output.type='numeric') {
 #
 # returns a list containing the tree, a vector of the estimated dates of the 
 # tips and internal nodes, the mutation rate and the log likelihood of the tree
-estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.phylo(t), output.type = 'vector') {
+estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output.type='numeric'), node.mask = integer(0), min.date = -.Machine$double.xmax, show.steps = 0, opt.tol = 1e-8, nsteps = 1000, lik.tol = 0, is.binary = is.binary.phylo(t), output.type = 'vector') {
 	
 	# check parameters
 	if (any(mu < 0))
@@ -144,6 +144,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		i <- i + 1
 	}
 	nodes <- rev(nodes)
+	nodes <- nodes[!(nodes %in% (node.mask - n.tips))]
 		
 	# calculate likelihood functions
 	scale.lik <- sum(-lgamma(t$edge.length+1)+(t$edge.length+1)*log(mu))
