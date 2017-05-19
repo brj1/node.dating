@@ -106,21 +106,24 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 	
 	# check parameters
 	if (any(mu < 0))
-		stop(paste("mu (", mu, ") less than 0", sep=""))
+		stop(paste0("mu (", mu, ") less than 0"))
 		
 	if (!(output.type %in% c('vector', 'list', 'phylo4d')))
-		stop(paste("unknown output type: ", output.type, sep=""))
+		stop(paste0("unknown output type: ", output.type))
 		
 	# init vars	
 	mu <- if (length(mu) == 1) rep(mu, length(t$edge.length)) else mu
 	n.tips <- length(t$tip.label)
 	dates <- if (length(node.dates) == n.tips) {
 			c(node.dates, rep(NA, t$Nnode))
-		} else {
+		} else if (length(node.dates) == n.tips + tree$Nnode) {
 			node.dates
+		} else {
+			stop(paste0("node.dates must be a vector with length equal to the number of tips or equal to the number of nodes plus the number of tips"))
 		}
 		
 	lik.sens <- if (lik.tol == 0) opt.tol else lik.tol
+	node.mask <- node.mask[node.mask > n.tips]
 	
 	# Don't count initial step if all values are seeded
 	iter.step <-  if (any(is.na(dates))) 0 else 1
@@ -136,16 +139,22 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		
 	# to process children before parents
 	nodes <- c(1)
+	min.dates <- rep(min.date, tree$Nnode)
+	min.dates[node.mask - n.tips] <- node.dates[node.mask]
 	for (i in 1:t$Nnode) {
 		to.add <- t$edge[children[[nodes[i]]], 2] - n.tips
 	
 		nodes <- c(nodes, to.add[to.add > 0])
 		
+		for (n in to.add[to.add > 0])
+			if (min.dates[n] < min.dates[nodes[[i]]])
+				min.dates[n] <- min.dates[nodes[[i]]]
+				
 		i <- i + 1
 	}
 	nodes <- rev(nodes)
 	nodes <- nodes[!(nodes %in% (node.mask - n.tips))]
-		
+	
 	# calculate likelihood functions
 	scale.lik <- sum(-lgamma(t$edge.length+1)+(t$edge.length+1)*log(mu))
 	
@@ -174,7 +183,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 	
 	solve.poly2 <- function(bounds, a, b, c.0) {
 		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
-	
+
 		if (b ^ 2 - 4 * a * c.0 >= 0) {
 			if (a == 0) {
 				y <- -c.0 / b
@@ -213,8 +222,6 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		a <- mu[ch.edge] - mu[par.edge]
 		b <- ch.edge.length + par.edge.length - a * (ch.times + par.time)
 		c.0 <- a*ch.times * par.time - ch.times * par.edge.length - par.time * ch.edge.length
-		
-		cat(sprintf("a: %f, b: %f, c: %f\n", a, b, c.0))
 		
 		x <- solve.poly2(bounds, a, b, c.0)					
 			
@@ -268,11 +275,11 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		p <- t$edge[p.edge, 1]
 		
 		m <- if (length(p) == 0 || is.na(dates[p])) {
-				min.date
+				min.dates[node]
 			} else {
 				dates[p]
 			}
-			
+					
 		if (is.binary) {
 			if (length(dates[p]) == 0 || is.na(dates[p])) {
 				if (length(ch.edge) == 2)
