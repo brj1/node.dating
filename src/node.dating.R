@@ -225,7 +225,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 			x.2 <- Re(-1 / (3 * a) * (b + complex(real=-1/2, imaginary=sqrt(3)/2) * C + delta.0 / (complex(real=-1/2, imaginary=sqrt(3)/2) * C)))
 			x.3 <- Re(-1 / (3 * a) * (b + complex(real=-1/2, imaginary=-sqrt(3)/2) * C + delta.0 / (complex(real=-1/2, imaginary=-sqrt(3)/2) * C)))
 		
-			if (x.1 && bounds[1] < x.1 && x.1 < bounds[2])
+			if (bounds[1] < x.1 && x.1 < bounds[2])
 				x <- c(x, x.1)
 			if (bounds[1] < x.2 && x.2 < bounds[2])
 				x <- c(x, x.2)
