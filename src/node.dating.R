@@ -110,9 +110,17 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		
 	if (!(output.type %in% c('vector', 'list', 'phylo4d')))
 		stop(paste0("unknown output type: ", output.type))
+	if (output.type == 'phylo4d' && !require(phylobase))
+		stop(paste0("library phylobase required for phylo4d output"))
 		
-	# init vars	
-	mu <- if (length(mu) == 1) rep(mu, length(t$edge.length)) else mu
+	# init vars
+	mu <- if (length(mu) == 1) {
+		rep(mu, length(t$edge.length))
+	} else if (length(mu) == nrow(t$edge)) {
+		mu
+	} else {
+		stop(paste0("mu must be a vector with length equal 1 or equal to the number of edges"))
+	}
 	n.tips <- length(t$tip.label)
 	dates <- if (length(node.dates) == n.tips) {
 			c(node.dates, rep(NA, t$Nnode))
@@ -337,7 +345,12 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 	
 	if (output.type == 'vector')
 		dates
-	else if (output.type == 'list') {
+	else if (output.type == 'phylo') {
+		time.t <- t
+		time.t$edge.length <- dates[t$edge[, 2]] - dates[t$edge[, 1]]
+       
+		time.t
+	} else if (output.type == 'list') {
 		time.t <- t
 		time.t$edge.length <- dates[t$edge[, 2]] - dates[t$edge[, 1]]
 	
