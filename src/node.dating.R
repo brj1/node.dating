@@ -56,7 +56,7 @@ estimate.mu <- function(t, node.dates, p.tol=0.05) {
 	
 	# test fit
 	if ((1 - pchisq(AIC(null.g) - AIC(g) + 2, df=1)) > p.tol) {
-		warning(paste("Cannot reject null hypothesis (p=", (1 - pchisq(AIC(null.g) - AIC(g))), ")"))
+		warning(paste("Cannot reject null hypothesis (p=", (1 - pchisq(AIC(null.g) - AIC(g), df=1)), ")"))
 	}
 	
 	coef(g)[[2]]
