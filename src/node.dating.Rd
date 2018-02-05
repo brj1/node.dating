@@ -17,7 +17,7 @@
     't$tip.label' or a vector of dates for all of the nodes.}
   \item{p}{p-value cutoff for failed regression.}
   \item{mu}{mutation rate.}
-  \item{min.date}{the minium bound on the dates of nodes}
+  \item{min.date}{the minimum bound on the dates of nodes}
   \item{show.steps}{print the log likelihood every show.steps.  If 0 will supress
     output.}
   \item{opt.tol}{tolerance for optimization precision.}
