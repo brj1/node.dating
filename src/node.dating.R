@@ -289,7 +289,9 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 			}
 					
 		if (is.binary) {
-			if (length(dates[p]) == 0 || is.na(dates[p])) {
+			if (m + 2 * opt.tol >= min(dates[ch])) {
+				mean(c(m, min(dates[ch])))
+			} else if (length(dates[p]) == 0 || is.na(dates[p])) {
 				if (length(ch.edge) == 2)
 					solve.bin(c(m, min(dates[ch])), dates[ch], ch.edge)
 				else
