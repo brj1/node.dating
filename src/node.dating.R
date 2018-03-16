@@ -147,14 +147,14 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		
 	# to process children before parents
 	nodes <- c(1)
-	min.dates <- rep(min.date, tree$Nnode)
+	min.dates <- rep(min.date, t$Nnode)
 	min.dates[node.mask - n.tips] <- node.dates[node.mask]
 	for (i in 1:t$Nnode) {
 		to.add <- t$edge[children[[nodes[i]]], 2] - n.tips
 	
 		nodes <- c(nodes, to.add[to.add > 0])
 		
-		for (n in to.add[to.add > 0])
+		for (n in to.add[to.add > 0])		
 			if (min.dates[n] < min.dates[nodes[[i]]])
 				min.dates[n] <- min.dates[nodes[[i]]]
 				
