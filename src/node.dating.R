@@ -107,7 +107,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 	n.tips <- length(t$tip.label)
 	dates <- if (length(node.dates) == n.tips) {
 			c(node.dates, rep(NA, t$Nnode))
-		} else if (length(node.dates) == n.tips + tree$Nnode) {
+		} else if (length(node.dates) == n.tips + t$Nnode) {
 			node.dates
 		} else {
 			stop(paste0("node.dates must be a vector with length equal to the number of tips or equal to the number of nodes plus the number of tips"))
