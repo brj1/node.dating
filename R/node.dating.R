@@ -67,6 +67,35 @@ estimate.mu <- function(t, node.dates, output.type='numeric') {
 		g
 }
 
+# strict molecular clock likelihood  with proportional substitutions for one edge
+likFn.strict <- function(t, ch.node, ch.edge, x, node.date, mu) {
+	tim <- node.date[ch.node] - node.date[x]
+						
+	t$edge.length[ch.edge]*log(tim)-mu[ch.edge]*tim - lgamma(t$edge.length[ch.edge]+1)+(t$edge.length[ch.edge]+1)*log(mu[ch.edge])
+}
+
+# S3 method for phylo to calculate the log likelihood
+logLik.phylo <- function(t, likFn, ...) {
+	sum(sapply(nrow(t$edge), function(i) likFn(t, i, t$edge[i, 2], t$edge[i, 1], ...)))
+}
+
+# strict molecular clock likelihood with proportional substitutions
+logLik.phylo.strict <- function(t, node.date, mu) {
+	mu <- if (length(mu) == 1) {
+		rep(mu, length(t$edge.length))
+	} else if (length(mu) == nrow(t$edge)) {
+		mu
+	} else {
+		stop(paste0("mu must be a vector with length equal 1 or equal to the number of edges"))
+	}
+	
+	if (length(node.dates) != n.tips + t$Nnode) {
+		stop(paste0("node.dates must be a vector with length r equal to the number of nodes plus the number of tips"))
+	}
+	
+	logLik.phylo(t, likFn=likFn.strict, node.dating=node.dating, mu=mu)
+}
+
 # Estimate the dates of the internal nodes of a phylogenetic tree.
 #
 # t: rooted tree with edge lengths equal to genetic distance
@@ -129,7 +158,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		} else {
 			stop(paste0("node.dates must be a vector with length equal to the number of tips or equal to the number of nodes plus the number of tips"))
 		}
-		
+				
 	lik.sens <- if (lik.tol == 0) opt.tol else lik.tol
 	node.mask <- node.mask[node.mask > n.tips]
 	
@@ -168,7 +197,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 	
 	calc.Like <- function(ch.node, ch.edge, x) {
 		tim <- ch.node - x
-						
+
 		t$edge.length[ch.edge]*log(tim)-mu[ch.edge]*tim
 	}
 	
@@ -260,7 +289,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 		
 		x
 	}
-	
+		
 	solve.cube <- function(bounds, ch.times, ch.edge, par.time, par.edge) {
 		ch.edge.length <- t$edge.length[ch.edge]
 		par.edge.length <- t$edge.length[par.edge]
@@ -318,7 +347,7 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates, output
 			dates[n + n.tips] <- estimate(n)
 		}
 		
-		all.lik <- 	calc.Like(dates[t$edge[,2]], 1:length(t$edge.length), dates[t$edge[,1]]) + scale.lik
+		all.lik <- calc.Like(dates[t$edge[,2]], 1:length(t$edge.length), dates[t$edge[,1]]) + scale.lik
 		new.lik <- sum(all.lik)
 		
 		if (show.steps > 0 && ((iter.step %% show.steps) == 0)) {
