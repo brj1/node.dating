@@ -293,9 +293,16 @@ estimate.dates <- function(
 		)
 	}
 	
+	get.bounds <- function(bounds) {
+		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		if (x[2] <= x[1])
+			x <- mean(x)
+		x
+	}
+	
 	solve.lin2 <- function(bounds, p.times, p.edge) {	
 		y <- p.times + t$edge.length[p.edge] / mu[p.edge]
-		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		x <- get.bounds(bounds)
 		if (bounds[1] < y && y < bounds[2])
 			x <- c(y, x)
 		
@@ -304,7 +311,7 @@ estimate.dates <- function(
 	
 	solve.lin <- function(bounds, ch.times, ch.edge) {	
 		y <- ch.times - t$edge.length[ch.edge] / mu[ch.edge]
-		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		x <- get.bounds(bounds)
 		if (bounds[1] < y && y < bounds[2])
 			x <- c(y, x)
 				
@@ -312,7 +319,7 @@ estimate.dates <- function(
 	}
 	
 	solve.poly2 <- function(bounds, a, b, c.0) {
-		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		x <- get.bounds(bounds)
 
 		if (b ^ 2 - 4 * a * c.0 >= 0) {
 			if (a == 0) {
@@ -367,7 +374,7 @@ estimate.dates <- function(
 	}
 	
 	solve.poly3 <- function(bounds, a, b, c.0, d) {
-		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
+		x <- get.bounds(bounds)
 	
 		if (a == 0)
 			x <- c(x, solve.poly2(bounds, b, c.0, d))
