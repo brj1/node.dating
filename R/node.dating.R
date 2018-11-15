@@ -296,7 +296,7 @@ estimate.dates <- function(
 	get.bounds <- function(bounds) {
 		x <- c(bounds[1] + opt.tol, bounds[2] - opt.tol)
 		if (x[2] <= x[1])
-			x <- mean(x)
+			x <- mean(bounds)
 		x
 	}
 	
