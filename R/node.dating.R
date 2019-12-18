@@ -191,7 +191,7 @@ estimate.dates <- function(
 	node.dates,
 	mu = estimate.mu(t, node.dates, output.type='numeric'),
 	node.mask = 1:length(tree$tip.label),
-	node.order=get.node.order(t),
+	node.order = get.node.order(t),
 	min.date = -.Machine$double.xmax,
 	max.date = .Machine$double.xmax,
 	show.steps = 0,
