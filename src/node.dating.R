@@ -148,10 +148,12 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 	}
 	
 	opt.fun <- function(x, ch, p, ch.edge, p.edge, use.parent=T) {
+	  
+	  
 		sum(if (!use.parent || length(dates[p]) == 0 || is.na(dates[p])) {		
-				calc.Like(dates[ch], t$edge.length[ch.edge], x)
+				calc.Like(dates[ch], ch.edge, x)
 			} else {
-				calc.Like(c(dates[ch], x), c(t$edge.length[ch.edge], t$edge.length[p.edge]), c(rep(x, length(dates[ch])), dates[p]))
+				calc.Like(c(dates[ch], x), c(ch.edge, p.edge), c(rep(x, length(dates[ch])), dates[p]))
 			})
 	}
 	
@@ -279,8 +281,8 @@ estimate.dates <- function(t, node.dates, mu = estimate.mu(t, node.dates), min.d
 				else
 					solve.bin2(c(m, min(dates[ch])), dates[ch], ch.edge, dates[p], p.edge)
 			}
-		} else {				
-			res <- optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge, p.edge, maximum=T)
+		} else {		
+		  res <- suppressWarnings(optimize(opt.fun, c(m, min(dates[ch])), ch, p, ch.edge, p.edge, maximum=T))
 		
 			res$maximum
 		}
