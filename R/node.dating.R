@@ -284,8 +284,8 @@ estimate.dates <- function(
 			} else {
 				calc.Like(
 					c(dates[ch], x),
-					c(t$edge.length[ch.edge],
-					  t$edge.length[p.edge]),
+					c(ch.edge,
+					  p.edge),
 					c(rep(x, length(dates[ch])), dates[p])
 				)
 			},
@@ -462,7 +462,7 @@ estimate.dates <- function(
 				}
 			}
 		} else {				
-			res <- optimize(opt.fun, c(m, M), ch, p, ch.edge, p.edge, maximum=T)
+			res <- suppressWarnings(optimize(opt.fun, c(m, M), ch, p, ch.edge, p.edge, maximum=T))
 		
 			res$maximum
 		}
